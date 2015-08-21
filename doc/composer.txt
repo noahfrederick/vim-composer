@@ -1,0 +1,51 @@
+*composer.txt*	Vim support for Composer PHP projects
+Noah Frederick                                       *Composer.vim* *composer*
+
+==============================================================================
+CONTENTS                                                   *composer-contents*
+  1. Introduction.............................................|composer-intro|
+  2. Commands..............................................|composer-commands|
+  3. Functions............................................|composer-functions|
+  4. About....................................................|composer-about|
+
+==============================================================================
+INTRODUCTION                                                  *composer-intro*
+
+Composer.vim provides conveniences for working with Composer PHP projects.
+Some features include:
+
+  * |:Composer| command wrapper around composer with smart completion
+  * Jump to your composer.json with |:Composer| command with no arguments
+  * Projectionist and Dispatch support (|:Dispatch| runs composer install)
+
+This plug-in is only available if 'compatible' is not set.
+
+==============================================================================
+COMMANDS                                                   *composer-commands*
+
+:Composer[!] [arguments]                                           *:Composer*
+  Run Composer with [arguments] with smart completion. With no arguments, edit
+  project's composer.json file.
+
+==============================================================================
+FUNCTIONS                                                 *composer-functions*
+
+composer#version()                                        *composer#version()*
+  Get the version number of the Composer.vim plug-in (e.g., '1.0.0').
+
+composer#query({key})                                       *composer#query()*
+  Query {key} from composer.json for current project.
+
+==============================================================================
+ABOUT                                                         *composer-about*
+
+Composer.vim is distributed under the same terms as Vim itself (see |license|)
+
+You can find the latest version of this plug-in on GitHub:
+https://github.com/noahfrederick/vim-composer
+
+Please report issues on GitHub as well:
+https://github.com/noahfrederick/vim-composer/issues
+
+
+vim:tw=78:ts=8:ft=help:norl:
