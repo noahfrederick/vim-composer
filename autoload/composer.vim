@@ -181,22 +181,30 @@ endfunction
 ""
 " Get Dict of subcommands, optionally belonging to [namespace].
 function! s:project_commands(...) dict abort
-  let namespace = get(a:000, 0, '')
-  let lines = split(self.exec(['list', namespace, '--raw']), "\n")
-  let commands = {}
+  let namespace = get(a:000, 0, '_')
 
-  if v:shell_error != 0
-    return commands
+  if !has_key(self, '_commands')
+    let self._commands = {}
   endif
 
-  call filter(lines,'v:val != ""')
+  if !has_key(self._commands, namespace)
+    let ns = namespace ==# '_' ? '' : namespace
+    let lines = split(self.exec(['list', ns, '--raw']), "\n")
+    let self._commands[namespace] = {}
 
-  for line in lines
-    let parts = split(line, '\s\s\+')
-    let commands[parts[0]] = parts[1]
-  endfor
+    if v:shell_error != 0
+      return self._commands[namespace]
+    endif
 
-  return commands
+    call filter(lines, 'v:val != ""')
+
+    for line in lines
+      let parts = split(line, '\s\s\+')
+      let self._commands[namespace][parts[0]] = parts[1]
+    endfor
+  endif
+
+  return self._commands[namespace]
 endfunction
 
 call s:add_methods('project', ['path', 'json', 'query', 'makeprg', 'make', 'exec', 'commands'])
@@ -235,12 +243,46 @@ endfunction
 " Completion for the :Composer command.
 function! composer#complete(A, L, P) abort
   if exists('g:composer_commands')
+    " Use a static list of subcommands for tests
     let commands = g:composer_commands
   else
-    let commands = keys(s:project().commands(''))
+    let commands = keys(s:project().commands())
   endif
 
-  return commands
+  let candidates = commands + s:composer_flags['_global']
+
+  if len(a:A) > 0
+    call filter(candidates, "v:val =~# '^' . a:A")
+  endif
+
+  return candidates
 endfunction
+
+" Unlike subcommands, composer does not list switches/flags in a friendly
+" format, so we hard-code them.
+let s:composer_flags = {
+      \   '_global': [
+      \     '--xml',
+      \     '--format',
+      \     '--raw',
+      \     '--help',
+      \     '-h',
+      \     '--quiet',
+      \     '-q',
+      \     '--verbose',
+      \     '-v',
+      \     '-vv',
+      \     '-vvv',
+      \     '--version',
+      \     '-V',
+      \     '--ansi',
+      \     '--no-ansi',
+      \     '--no-interaction',
+      \     '-n',
+      \     '--profile',
+      \     '--working-dir',
+      \     '-d',
+      \   ]
+      \ }
 
 " vim: fdm=marker:sw=2:sts=2:et

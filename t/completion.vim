@@ -8,8 +8,18 @@ describe 'composer#complete'
     Expect type(composer#complete('', '', '')) == type([])
   end
 
-  it 'returns a list of commands'
-    Expect composer#complete('', '', '') == g:composer_commands
+  it 'returns a list containing commands'
+    for cmd in g:composer_commands
+      Expect index(composer#complete('', '', ''), cmd) >= 0
+    endfor
+  end
+
+  it 'returns a list containing global flags'
+    Expect index(composer#complete('', '', ''), '--xml') >= 0
+  end
+
+  it 'filters completions based on ArgLead'
+    Expect composer#complete('he', '', '') == ['help']
   end
 end
 
