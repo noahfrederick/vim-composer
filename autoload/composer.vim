@@ -155,8 +155,21 @@ function! s:project_makeprg() dict abort
 endfunction
 
 ""
-" Call Composer with {args} in project's root directory.
-function! s:project_exec(bang, args) dict abort
+" Get output from Composer with {args} in project's root directory.
+function! s:project_exec(args) dict abort
+  let cwd = s:cd(self.path())
+  try
+    let result = system(join([self.makeprg()] + a:args))
+  finally
+    call s:cd(cwd)
+  endtry
+
+  return result
+endfunction
+
+""
+" Call Composer via @command(:make) with {args} in project's root directory.
+function! s:project_make(bang, args) dict abort
   let cwd = s:cd(self.path())
   try
     execute '!' . join([self.makeprg()] + a:args)
@@ -165,7 +178,28 @@ function! s:project_exec(bang, args) dict abort
   endtry
 endfunction
 
-call s:add_methods('project', ['path', 'json', 'query', 'makeprg', 'exec'])
+""
+" Get Dict of subcommands, optionally belonging to [namespace].
+function! s:project_commands(...) dict abort
+  let namespace = get(a:000, 0, '')
+  let lines = split(self.exec(['list', namespace, '--raw']), "\n")
+  let commands = {}
+
+  if v:shell_error != 0
+    return commands
+  endif
+
+  call filter(lines,'v:val != ""')
+
+  for line in lines
+    let parts = split(line, '\s\s\+')
+    let commands[parts[0]] = parts[1]
+  endfor
+
+  return commands
+endfunction
+
+call s:add_methods('project', ['path', 'json', 'query', 'makeprg', 'make', 'exec', 'commands'])
 
 ""
 " @public
@@ -193,17 +227,20 @@ function! s:composer_cmd(...) abort
   let args = copy(a:000)
   let bang = remove(args, 0)
 
-  return s:project().exec(bang, args)
+  return s:project().make(bang, args)
 endfunction
 
 ""
 " @private
 " Completion for the :Composer command.
 function! composer#complete(A, L, P) abort
-  return [
-        \ 'install',
-        \ 'update',
-        \ ]
+  if exists('g:composer_commands')
+    let commands = g:composer_commands
+  else
+    let commands = keys(s:project().commands(''))
+  endif
+
+  return commands
 endfunction
 
 " vim: fdm=marker:sw=2:sts=2:et
