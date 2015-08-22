@@ -5,7 +5,7 @@
 " @public
 " Get the version number of the @plugin(stylized) plug-in (e.g., '1.0.0').
 function! composer#version()
-  return '0.0.0'
+  return '0.1.0'
 endfunction
 
 ""
