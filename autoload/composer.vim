@@ -180,8 +180,7 @@ endfunction
 function! composer#buffer_setup() abort
   ""
   " @command Composer[!] [arguments]
-  " Run Composer with [arguments] with smart completion. With no arguments,
-  " edit project's composer.json file.
+  " Run Composer with [arguments] with smart completion.
   command! -buffer -bang -bar -nargs=? -complete=customlist,composer#complete
         \ Composer call s:composer_cmd(<q-bang>, <f-args>)
 
@@ -193,11 +192,6 @@ endfunction
 function! s:composer_cmd(...) abort
   let args = copy(a:000)
   let bang = remove(args, 0)
-
-  if len(args) == 0
-    execute 'Ecomposer' . bang
-    return 0
-  endif
 
   return s:project().exec(bang, args)
 endfunction

@@ -15,8 +15,9 @@ Composer.vim provides conveniences for working with Composer PHP projects.
 Some features include:
 
   * |:Composer| command wrapper around composer with smart completion
-  * Jump to your composer.json with |:Composer| command with no arguments
-  * Projectionist and Dispatch support (|:Dispatch| runs composer install)
+  * Projectionist support (e.g., :Ecomposer to edit your composer.json, :A to
+    jump to composer.lock and back)
+  * Dispatch support (|:Dispatch| runs composer install)
 
 This plug-in is only available if 'compatible' is not set.
 
@@ -24,8 +25,7 @@ This plug-in is only available if 'compatible' is not set.
 COMMANDS                                                   *composer-commands*
 
 :Composer[!] [arguments]                                           *:Composer*
-  Run Composer with [arguments] with smart completion. With no arguments, edit
-  project's composer.json file.
+  Run Composer with [arguments] with smart completion.
 
 ==============================================================================
 FUNCTIONS                                                 *composer-functions*

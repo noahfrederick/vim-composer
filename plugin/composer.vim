@@ -8,8 +8,9 @@
 " projects. Some features include:
 "
 " * @command(:Composer) command wrapper around composer with smart completion
-" * Jump to your composer.json with @command(:Composer) command with no arguments
-" * Projectionist and Dispatch support (|:Dispatch| runs composer install)
+" * Projectionist support (e.g., :Ecomposer to edit your composer.json, :A to
+"   jump to composer.lock and back)
+" * Dispatch support (|:Dispatch| runs composer install)
 "
 " This plug-in is only available if 'compatible' is not set.
 
