@@ -53,7 +53,11 @@ endfunction
 ""
 " Get Dict from JSON {string}.
 function! s:json_parse(string) abort
-  return projectionist#json_parse(a:string)
+  try
+    return projectionist#json_parse(a:string)
+  catch /^Vim\%((\a\+)\)\=:E117/
+    s:throw('projectionist is not available')
+  endtry
 endfunction
 
 ""
@@ -132,9 +136,10 @@ endfunction
 " supplied, reread the file instead of using the cached contents.
 function! s:project_lock(...) dict abort
   let recache = get(a:000, 0, 0)
+  let lockfile = self.path('composer.lock')
 
-  if !has_key(self, '_lock') || recache
-    let self._lock = s:json_parse(readfile(self.path('composer.lock')))
+  if  (!has_key(self, '_lock') || recache) && filereadable(lockfile)
+    let self._lock = s:json_parse(readfile(lockfile))
   endif
 
   return self._lock
@@ -213,7 +218,7 @@ call s:add_methods('project', ['path', 'json', 'query', 'makeprg', 'make', 'exec
 " @public
 " Query {key} from composer.json for current project.
 function! composer#query(key) abort
-  return composer#project().query(a:key)
+  return s:project().query(a:key)
 endfunction
 
 ""
