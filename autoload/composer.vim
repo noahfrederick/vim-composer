@@ -162,25 +162,14 @@ endfunction
 ""
 " Get output from Composer with {args} in project's root directory.
 function! s:project_exec(args) dict abort
-  let cwd = s:cd(self.path())
   try
+    let cwd = s:cd(self.path())
     let result = system(join([self.makeprg()] + a:args))
   finally
     call s:cd(cwd)
   endtry
 
   return result
-endfunction
-
-""
-" Call Composer via @command(:make) with {args} in project's root directory.
-function! s:project_make(bang, args) dict abort
-  let cwd = s:cd(self.path())
-  try
-    execute '!' . join([self.makeprg()] + a:args)
-  finally
-    call s:cd(cwd)
-  endtry
 endfunction
 
 ""
@@ -212,7 +201,7 @@ function! s:project_commands(...) dict abort
   return self._commands[namespace]
 endfunction
 
-call s:add_methods('project', ['path', 'json', 'query', 'makeprg', 'make', 'exec', 'commands'])
+call s:add_methods('project', ['path', 'json', 'query', 'makeprg', 'exec', 'commands'])
 
 ""
 " @public
@@ -227,9 +216,11 @@ endfunction
 function! composer#buffer_setup() abort
   ""
   " @command Composer[!] [arguments]
-  " Run Composer with [arguments] with smart completion.
+  " Run Composer with [arguments] via @command(:make)[!] with smart
+  " completion. The command is run asynchronously when paired with
+  " Dispatch.vim.
   command! -buffer -bang -bar -nargs=? -complete=customlist,composer#complete
-        \ Composer call s:composer_cmd(<q-bang>, <f-args>)
+        \ Composer execute s:composer_cmd(<q-bang>, <f-args>)
 
   silent doautocmd User Composer
 endfunction
@@ -240,7 +231,40 @@ function! s:composer_cmd(...) abort
   let args = copy(a:000)
   let bang = remove(args, 0)
 
-  return s:project().make(bang, args)
+  let old_makeprg = &l:makeprg
+  let old_errorformat = &l:errorformat
+  let old_compiler = get(b:, 'current_compiler', '')
+
+  try
+    let cwd = s:cd(s:project().path())
+
+    if !empty(findfile('compiler/composer.vim', escape(&rtp, ' ')))
+      compiler composer
+    else
+      let &l:errorformat = '%+I%.%#'
+      let b:current_compiler = 'composer'
+    endif
+    let &l:makeprg = s:project().makeprg()
+
+    if exists(':Make') == 2
+      execute join(['Make' . bang] + args)
+    else
+      execute join(['make!'] + args)
+      if bang ==# ''
+        return 'cwindow'
+      endif
+    endif
+    return ''
+  finally
+    let &l:errorformat = old_errorformat
+    let &l:makeprg = old_makeprg
+    let b:current_compiler = old_compiler
+    if empty(old_compiler)
+      unlet! b:current_compiler
+    endif
+
+    call s:cd(cwd)
+  endtry
 endfunction
 
 ""
