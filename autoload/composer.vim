@@ -16,6 +16,27 @@ function! s:throw(msg) abort
 endfunction
 
 ""
+" Implement uniq() for older Vims. Adapted from projectionist.vim.
+function! s:uniq(list) abort
+  if exists('*uniq')
+    return uniq(a:list)
+  endif
+
+  let i = 0
+  let seen = {}
+  while i < len(a:list)
+    let str = string(a:list[i])
+    if has_key(seen, str)
+      call remove(a:list, i)
+    else
+      let seen[str] = 1
+      let i += 1
+    endif
+  endwhile
+  return a:list
+endfunction
+
+""
 " Change working directory to {dir}, respecting current window's local dir
 " state. Returns old working directory to be restored later by a second
 " invocation of the function.
@@ -305,7 +326,7 @@ function! s:filter_completions(candidates, A) abort
     call filter(candidates, "v:val =~# '^' . a:A")
   endif
   call sort(candidates)
-  call uniq(candidates)
+  call s:uniq(candidates)
 
   let commands = filter(copy(candidates), "v:val[0] !=# '-'")
   let flags = filter(copy(candidates), "v:val[0] ==# '-'")
