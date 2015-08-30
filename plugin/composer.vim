@@ -4,6 +4,7 @@
 ""
 " @section Introduction, intro
 " @stylized Composer.vim
+" @order intro commands autocommands functions about
 " @plugin(stylized) provides conveniences for working with Composer PHP
 " projects. Some features include:
 "
@@ -24,6 +25,13 @@
 "
 " Please report issues on GitHub as well:
 " https://github.com/noahfrederick/vim-@plugin(name)/issues
+
+""
+" @section Autocommands, autocommands
+" If you want to set your own Vim settings for buffers belonging to your
+" Composer project, you may do so from your vimrc using an autocommand: >
+"   autocmd User Composer nnoremap <buffer> <F2> :Composer dump-autoload<CR>
+" <
 
 if (exists('g:loaded_composer') && g:loaded_composer) || &cp
   finish
