@@ -184,7 +184,7 @@ function! s:project_commands(...) dict abort
   if !has_key(self._commands, namespace)
     let ns = namespace ==# '_' ? '' : namespace
     let lines = split(self.exec(['list', ns, '--raw']), "\n")
-    let self._commands[namespace] = {}
+    let self._commands[namespace] = []
 
     if v:shell_error != 0
       return self._commands[namespace]
@@ -194,7 +194,7 @@ function! s:project_commands(...) dict abort
 
     for line in lines
       let parts = split(line, '\s\s\+')
-      let self._commands[namespace][parts[0]] = parts[1]
+      call add(self._commands[namespace], parts[0])
     endfor
   endif
 
@@ -271,20 +271,46 @@ endfunction
 " @private
 " Completion for the :Composer command.
 function! composer#complete(A, L, P) abort
-  if exists('g:composer_commands')
-    " Use a static list of subcommands for tests
-    let commands = g:composer_commands
+  let commands = copy(s:project().commands())
+
+  call remove(commands, index(commands, 'global'))
+  call remove(commands, index(commands, 'help'))
+  let subcommand = matchstr(a:L, '\<\(' . join(commands, '\|') . '\)\>')
+  let global = matchstr(a:L, '\<global\>')
+  let help = matchstr(a:L, '\<help\>')
+
+  if global ==# 'global' && subcommand ==# ''
+    let candidates = commands + s:composer_flags['_global'] + ['help']
+  elseif help ==# 'help' && subcommand ==# ''
+    let candidates = commands + s:composer_flags['_global'] + ['global', 'help']
+  elseif has_key(s:composer_flags, subcommand) && subcommand !=# ''
+    let candidates = s:composer_flags['_global'] + s:composer_flags[subcommand]
+  elseif subcommand !=# ''
+    let candidates = s:composer_flags['_global']
   else
-    let commands = keys(s:project().commands())
+    let candidates = commands + s:composer_flags['_global'] + ['global', 'help']
   endif
 
-  let candidates = commands + s:composer_flags['_global']
+  return s:filter_completions(candidates, a:A)
+endfunction
 
+""
+" Sort and filter completion {candidates} based on the current argument {A}.
+function! s:filter_completions(candidates, A) abort
+  let candidates = copy(a:candidates)
+  if len(candidates) == 0
+    return []
+  endif
   if len(a:A) > 0
     call filter(candidates, "v:val =~# '^' . a:A")
   endif
+  call sort(candidates)
+  call uniq(candidates)
 
-  return candidates
+  let commands = filter(copy(candidates), "v:val[0] !=# '-'")
+  let flags = filter(copy(candidates), "v:val[0] ==# '-'")
+
+  return commands + flags
 endfunction
 
 " Unlike subcommands, composer does not list switches/flags in a friendly
@@ -311,7 +337,154 @@ let s:composer_flags = {
       \     '--profile',
       \     '--working-dir',
       \     '-d',
-      \   ]
+      \   ],
+      \   'install': [
+      \     '--prefer-source',
+      \     '--prefer-dist',
+      \     '--ignore-platform-reqs',
+      \     '--dry-run',
+      \     '--dev',
+      \     '--no-dev',
+      \     '--no-autoloader',
+      \     '--no-scripts',
+      \     '--no-plugins',
+      \     '--no-progress',
+      \     '--optimize-autoloader',
+      \     '-o',
+      \   ],
+      \   'update': [
+      \     '--prefer-source',
+      \     '--prefer-dist',
+      \     '--ignore-platform-reqs',
+      \     '--dry-run',
+      \     '--dev',
+      \     '--no-dev',
+      \     '--no-autoloader',
+      \     '--no-scripts',
+      \     '--no-plugins',
+      \     '--no-progress',
+      \     '--optimize-autoloader',
+      \     '-o',
+      \     '--lock',
+      \     '--with-dependencies',
+      \     '--prefer-stable',
+      \     '--prefer-lowest',
+      \   ],
+      \   'require': [
+      \     '--prefer-source',
+      \     '--prefer-dist',
+      \     '--ignore-platform-reqs',
+      \     '--dev',
+      \     '--no-update',
+      \     '--no-progress',
+      \     '--update-no-dev',
+      \     '--update-with-dependencies',
+      \     '--sort-packages',
+      \   ],
+      \   'remove': [
+      \     '--ignore-platform-reqs',
+      \     '--dev',
+      \     '--no-update',
+      \     '--no-progress',
+      \     '--update-no-dev',
+      \     '--update-with-dependencies',
+      \   ],
+      \   'search': [
+      \     '--only-name',
+      \     '-N',
+      \   ],
+      \   'show': [
+      \     '--installed',
+      \     '-i',
+      \     '--platform',
+      \     '-p',
+      \     '--self',
+      \     '-s',
+      \   ],
+      \   'browse': [
+      \     '--homepage',
+      \     '-H',
+      \   ],
+      \   'home': [
+      \     '--homepage',
+      \     '-H',
+      \   ],
+      \   'suggests': [
+      \     '--no-dev',
+      \     '--verbose',
+      \     '-v',
+      \   ],
+      \   'depends': [
+      \     '--link-type',
+      \   ],
+      \   'validate': [
+      \     '--no-check-all',
+      \     '--no-check-lock',
+      \     '--no-check-publish',
+      \   ],
+      \   'status': [
+      \   ],
+      \   'self-update': [
+      \     '--rollback',
+      \     '-r',
+      \     '--clean-backups',
+      \   ],
+      \   'config': [
+      \     '--global',
+      \     '-g',
+      \     '--editor',
+      \     '-e',
+      \     '--unset',
+      \     '--list',
+      \     '-l',
+      \     '--file',
+      \     '-f',
+      \     '--absolute',
+      \   ],
+      \   'create-project': [
+      \     '--repository-url',
+      \     '--stability',
+      \     '-s',
+      \     '--prefer-source',
+      \     '--prefer-dist',
+      \     '--dev',
+      \     '--no-install',
+      \     '--no-plugins',
+      \     '--no-scripts',
+      \     '--no-progress',
+      \     '--keep-vcs',
+      \     '--ignore-platform-reqs',
+      \   ],
+      \   'dump-autoload': [
+      \     '--optimize',
+      \     '-o',
+      \     '--no-dev',
+      \   ],
+      \   'clear-cache': [
+      \   ],
+      \   'licenses': [
+      \     '--no-dev',
+      \     '--format',
+      \   ],
+      \   'run-script': [
+      \     '--no-dev',
+      \     '--list',
+      \   ],
+      \   'diagnose': [
+      \   ],
+      \   'archive': [
+      \     '--format',
+      \     '-f',
+      \     '--dir',
+      \   ],
       \ }
+
+""
+" @private
+" Hack for testing script-local functions.
+function! composer#sid()
+  nnoremap <SID> <SID>
+  return maparg('<SID>', 'n')
+endfunction
 
 " vim: fdm=marker:sw=2:sts=2:et

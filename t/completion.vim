@@ -1,25 +1,125 @@
 " t/completion.vim - Completion tests
 " Maintainer: Noah Frederick
 
-let g:composer_commands = ['install', 'update', 'help']
+let s:fixtures = fnamemodify('t/fixtures/', ':p')
+let s:composer_commands = ['global', 'install', 'update', 'help']
 
-describe 'composer#complete()'
+call vspec#hint({'sid': 'composer#sid()'})
+
+" Mock s:project().commands()
+let b:composer_root = s:fixtures . 'project-composer/'
+let s:project = composer#project(b:composer_root)
+let s:project._commands = {'_': s:composer_commands}
+
+describe 's:filter_completions()'
   it 'returns a list of completions'
-    Expect type(composer#complete('', '', '')) == type([])
+    let result = vspec#call('s:filter_completions', [], '')
+    Expect type(result) == type([])
   end
 
-  it 'returns a list containing commands'
-    for cmd in g:composer_commands
-      Expect index(composer#complete('', '', ''), cmd) >= 0
-    endfor
+  it 'sorts the completions alphabetically'
+    let candidates = ['b', 'a', '-a', '-b']
+    let result = vspec#call('s:filter_completions', candidates, '')
+    Expect index(result, 'a')  < index(result, 'b')
+    Expect index(result, '-a') < index(result, '-b')
   end
 
-  it 'returns a list containing global flags'
-    Expect index(composer#complete('', '', ''), '--xml') >= 0
+  it 'sorts commands before flags'
+    let candidates = ['-a', 'b', '--foo', 'a']
+    let result = vspec#call('s:filter_completions', candidates, '')
+    Expect index(result, 'a')     < index(result, '-a')
+    Expect index(result, 'b')     < index(result, '-a')
+    Expect index(result, '--foo') < index(result, '-a')
+  end
+
+  it 'removes duplicates'
+    let candidates = ['a', 'b', 'a', 'a']
+    let result = vspec#call('s:filter_completions', candidates, '')
+    Expect result == ['a', 'b']
   end
 
   it 'filters completions based on ArgLead'
-    Expect composer#complete('he', '', '') == ['help']
+    let candidates = ['global', 'help', 'install', 'update']
+    let result = vspec#call('s:filter_completions', candidates, 'he')
+    Expect result == ['help']
+  end
+end
+
+describe 'composer#complete()'
+  it 'returns a list of completions'
+    Expect type(composer#complete('', '', 0)) == type([])
+  end
+
+  context 'with no preceding arguments'
+    it 'returns a list containing all commands'
+      for cmd in s:composer_commands
+        Expect index(composer#complete('', '', 0), cmd) >= 0
+      endfor
+    end
+
+    it 'returns a list containing global flags'
+      Expect index(composer#complete('', '', 0), '--xml') >= 0
+    end
+
+    it 'returns a list excluding subcommand flags'
+      Expect index(composer#complete('', '', 0), '--sort-packages') == -1
+    end
+  end
+
+  context 'with global argument'
+    it 'returns a list containing commands modifyable by global'
+      let cmds = composer#complete('', 'global ', 6)
+      Expect index(cmds, 'global') == -1
+      Expect index(cmds, 'help') >= 0
+      Expect index(cmds, 'install') >= 0
+      Expect index(cmds, 'update') >= 0
+    end
+
+    it 'returns a list containing global flags'
+      Expect index(composer#complete('', 'global ', 6), '--xml') >= 0
+    end
+
+    it 'filters completions based on ArgLead'
+      Expect composer#complete('in', 'global in', 8) == ['install']
+    end
+  end
+
+  context 'with help argument'
+    it 'returns a list containing commands modifyable by help'
+      let cmds = composer#complete('', 'help ', 5)
+      Expect index(cmds, 'global') >= 0
+      Expect index(cmds, 'help') >= 0
+      Expect index(cmds, 'install') >= 0
+      Expect index(cmds, 'update') >= 0
+    end
+
+    it 'returns a list containing global flags'
+      Expect index(composer#complete('', 'help ', 5), '--xml') >= 0
+    end
+
+    it 'filters completions based on ArgLead'
+      Expect composer#complete('in', 'help in', 7) == ['install']
+    end
+  end
+
+  context 'with subcommand argument'
+    it 'does not return commands'
+      let cmds = composer#complete('', 'install ', 8)
+      Expect index(cmds, 'global') == -1
+      Expect index(cmds, 'help') == -1
+      Expect index(cmds, 'install') == -1
+      Expect index(cmds, 'update') == -1
+    end
+
+    it 'returns a list containing global flags'
+      Expect index(composer#complete('', 'install ', 8), '--xml') >= 0
+      Expect index(composer#complete('', 'global install ', 15), '--xml') >= 0
+    end
+
+    it 'returns a list containing subcommand-specific flags'
+      Expect index(composer#complete('', 'install ', 8), '-o') >= 0
+      Expect index(composer#complete('', 'global install ', 15), '-o') >= 0
+    end
   end
 end
 
