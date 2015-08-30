@@ -3,6 +3,8 @@
 
 let g:fixtures = fnamemodify('t/fixtures/', ':p')
 
+call vspec#hint({'sid': 'composer#sid()'})
+
 runtime plugin/composer.vim
 
 describe 'composer#project()'
@@ -58,6 +60,36 @@ describe 'composer#project()'
       it 'returns the composer executable name'
         Expect b:project.makeprg() ==# 'php composer.phar'
       end
+    end
+  end
+end
+
+describe 's:project()'
+  after
+    bwipeout!
+  end
+
+  context 'in a non-composer project'
+    before
+      execute 'edit' g:fixtures . 'project-other/index.php'
+    end
+
+    it 'throws an error'
+      Expect expr { vspec#call('s:project') } to_throw '^composer: not a composer project:'
+    end
+  end
+
+  context 'in a composer project'
+    before
+      execute 'edit' g:fixtures . 'project-composer/index.php'
+    end
+
+    it 'does not throw an error'
+      Expect expr { vspec#call('s:project') } not to_throw '^composer:'
+    end
+
+    it 'returns a project object'
+      Expect has_key(vspec#call('s:project'), '_root') to_be_true
     end
   end
 end
