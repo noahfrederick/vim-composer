@@ -3,7 +3,7 @@
 
 let g:composer_commands = ['install', 'update', 'help']
 
-describe 'composer#complete'
+describe 'composer#complete()'
   it 'returns a list of completions'
     Expect type(composer#complete('', '', '')) == type([])
   end
