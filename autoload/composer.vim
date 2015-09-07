@@ -74,11 +74,13 @@ endfunction
 ""
 " Get Dict from JSON {string}.
 function! s:json_parse(string) abort
+  let result = {}
   try
-    return projectionist#json_parse(a:string)
+    let result = projectionist#json_parse(a:string)
   catch /^Vim\%((\a\+)\)\=:E117/
-    s:throw('projectionist is not available')
+    call s:throw('projectionist is not available')
   endtry
+  return result
 endfunction
 
 ""
@@ -172,6 +174,13 @@ function! s:project_query(key) dict abort
   return s:get_nested(self.json(), a:key, '')
 endfunction
 
+""
+" Get Dict of packages required in composer.json, where the keys represent
+" package names and the values represent the version constraints.
+function! s:project_packages_required() dict abort
+  return get(self.json(), 'require', {})
+endfunction
+
 function! s:project_makeprg() dict abort
   if filereadable(self.path('composer.phar'))
     return 'php composer.phar'
@@ -222,7 +231,7 @@ function! s:project_commands(...) dict abort
   return self._commands[namespace]
 endfunction
 
-call s:add_methods('project', ['path', 'json', 'query', 'makeprg', 'exec', 'commands'])
+call s:add_methods('project', ['path', 'json', 'query', 'makeprg', 'exec', 'commands', 'packages_required'])
 
 ""
 " @public
@@ -310,6 +319,10 @@ function! composer#complete(A, L, P) abort
     let candidates = s:composer_flags['_global']
   else
     let candidates = commands + s:composer_flags['_global'] + ['global', 'help']
+  endif
+
+  if help ==# '' && index(['remove', 'update', 'suggests'], subcommand) >= 0
+    let candidates = candidates + keys(s:project().packages_required())
   endif
 
   return s:filter_completions(candidates, a:A)

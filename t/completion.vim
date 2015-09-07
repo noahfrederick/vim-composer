@@ -2,14 +2,15 @@
 " Maintainer: Noah Frederick
 
 let s:fixtures = fnamemodify('t/fixtures/', ':p')
-let s:composer_commands = ['global', 'install', 'update', 'help']
+let s:composer_commands = ['global', 'install', 'update', 'suggests', 'remove', 'help']
 
 call vspec#hint({'sid': 'composer#sid()'})
 
-" Mock s:project().commands()
+" Mock s:project().commands() and s:project().json()
 let b:composer_root = s:fixtures . 'project-composer/'
 let s:project = composer#project(b:composer_root)
 let s:project._commands = {'_': s:composer_commands}
+let s:project._json = {'require': {'some/package': '1.0.0'}}
 
 describe 's:filter_completions()'
   it 'returns a list of completions'
@@ -119,6 +120,16 @@ describe 'composer#complete()'
     it 'returns a list containing subcommand-specific flags'
       Expect index(composer#complete('', 'install ', 8), '-o') >= 0
       Expect index(composer#complete('', 'global install ', 15), '-o') >= 0
+    end
+  end
+
+  context 'with subcommands that take a required package as argument'
+    it 'returns a list containing required packages'
+      Expect index(composer#complete('', 'remove ', 7), 'some/package') >= 0
+      Expect index(composer#complete('', 'update ', 7), 'some/package') >= 0
+      Expect index(composer#complete('', 'suggests ', 9), 'some/package') >= 0
+      Expect index(composer#complete('', 'help ', 5), 'some/package') == -1
+      Expect index(composer#complete('', 'help remove ', 12), 'some/package') == -1
     end
   end
 end
