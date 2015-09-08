@@ -142,6 +142,12 @@ function! s:project_path(...) dict abort
 endfunction
 
 ""
+" Check whether file is readable in project.
+function! s:project_has_file(file) dict abort
+  return filereadable(self.path(a:file))
+endfunction
+
+""
 " Get JSON contents of composer.json as a Dict. If the [recache] flag is
 " supplied, reread the file instead of using the cached contents.
 function! s:project_json(...) dict abort
@@ -182,7 +188,7 @@ function! s:project_packages_required() dict abort
 endfunction
 
 function! s:project_makeprg() dict abort
-  if filereadable(self.path('composer.phar'))
+  if self.has_file('composer.phar')
     return 'php composer.phar'
   else
     return 'composer'
@@ -231,7 +237,7 @@ function! s:project_commands(...) dict abort
   return self._commands[namespace]
 endfunction
 
-call s:add_methods('project', ['path', 'json', 'query', 'makeprg', 'exec', 'commands', 'packages_required'])
+call s:add_methods('project', ['path', 'has_file', 'json', 'query', 'makeprg', 'exec', 'commands', 'packages_required'])
 
 ""
 " @public
