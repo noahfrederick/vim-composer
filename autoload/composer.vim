@@ -235,6 +235,12 @@ function! s:cache_clear(...) dict abort
   endif
 endfunction
 
+function! composer#cache_clear(...) abort
+  if exists('b:composer_root')
+    return call(composer#project().cache.clear, a:000, composer#project().cache)
+  endif
+endfunction
+
 function! s:cache_get(...) dict abort
   if a:0 == 0
     return self.cache
@@ -258,6 +264,11 @@ endfunction
 call s:add_methods('cache', ['clear', 'get', 'set', 'has', 'needs'])
 
 let s:project_prototype.cache = s:cache_prototype
+
+augroup composer_cache
+  autocmd!
+  autocmd BufWritePost composer.json call composer#cache_clear('json')
+augroup END
 
 ""
 " @public
