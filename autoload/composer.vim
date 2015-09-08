@@ -148,30 +148,23 @@ function! s:project_has_file(file) dict abort
 endfunction
 
 ""
-" Get JSON contents of composer.json as a Dict. If the [recache] flag is
-" supplied, reread the file instead of using the cached contents.
-function! s:project_json(...) dict abort
-  let recache = get(a:000, 0, 0)
-
-  if !has_key(self, '_json') || recache
-    let self._json = s:json_parse(readfile(self.path('composer.json')))
+" Get JSON contents of composer.json as a Dict.
+function! s:project_json() dict abort
+  if self.cache.needs('json')
+    call self.cache.set('json', s:json_parse(readfile(self.path('composer.json'))))
   endif
 
-  return self._json
+  return self.cache.get('json')
 endfunction
 
 ""
-" Get JSON contents of composer.lock as a Dict. If the [recache] flag is
-" supplied, reread the file instead of using the cached contents.
-function! s:project_lock(...) dict abort
-  let recache = get(a:000, 0, 0)
-  let lockfile = self.path('composer.lock')
-
-  if  (!has_key(self, '_lock') || recache) && filereadable(lockfile)
-    let self._lock = s:json_parse(readfile(lockfile))
+" Get JSON contents of composer.lock as a Dict.
+function! s:project_lock() dict abort
+  if self.cache.needs('lock') && self.has_file('composer.lock')
+    call self.cache.set('lock', s:json_parse(readfile(self.path('composer.lock'))))
   endif
 
-  return self._lock
+  return self.cache.get('lock')
 endfunction
 
 ""
@@ -211,33 +204,60 @@ endfunction
 ""
 " Get Dict of subcommands, optionally belonging to [namespace].
 function! s:project_commands(...) dict abort
-  let namespace = get(a:000, 0, '_')
+  let namespace = get(a:000, 0, '')
+  let cache = namespace ==# '' ? 'commands' : 'commands_' . namespace
 
-  if !has_key(self, '_commands')
-    let self._commands = {}
-  endif
-
-  if !has_key(self._commands, namespace)
-    let ns = namespace ==# '_' ? '' : namespace
-    let lines = split(self.exec(['list', ns, '--raw']), "\n")
-    let self._commands[namespace] = []
+  if self.cache.needs(cache)
+    let lines = split(self.exec(['list', namespace, '--raw']), "\n")
 
     if v:shell_error != 0
-      return self._commands[namespace]
+      return []
     endif
 
+    call map(lines, "matchstr(v:val, '^\\w\\+')")
     call filter(lines, 'v:val != ""')
 
-    for line in lines
-      let parts = split(line, '\s\s\+')
-      call add(self._commands[namespace], parts[0])
-    endfor
+    call self.cache.set(cache, lines)
   endif
 
-  return self._commands[namespace]
+  return self.cache.get(cache)
 endfunction
 
 call s:add_methods('project', ['path', 'has_file', 'json', 'query', 'makeprg', 'exec', 'commands', 'packages_required'])
+
+let s:cache_prototype = {'cache': {}}
+
+function! s:cache_clear(...) dict abort
+  if a:0 == 0
+    let self.cache = {}
+  elseif has_key(self, 'cache') && has_key(self.cache, a:1)
+    unlet! self.cache[a:1]
+  endif
+endfunction
+
+function! s:cache_get(...) dict abort
+  if a:0 == 0
+    return self.cache
+  else
+    return self.cache[a:1]
+  endif
+endfunction
+
+function! s:cache_set(key, value) dict abort
+  let self.cache[a:key] = a:value
+endfunction
+
+function! s:cache_has(key) dict abort
+  return has_key(self.cache, a:key)
+endfunction
+
+function! s:cache_needs(key) dict abort
+  return !has_key(self.cache, a:key)
+endfunction
+
+call s:add_methods('cache', ['clear', 'get', 'set', 'has', 'needs'])
+
+let s:project_prototype.cache = s:cache_prototype
 
 ""
 " @public

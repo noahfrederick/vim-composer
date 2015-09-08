@@ -9,8 +9,8 @@ call vspec#hint({'sid': 'composer#sid()'})
 " Mock s:project().commands() and s:project().json()
 let b:composer_root = s:fixtures . 'project-composer/'
 let s:project = composer#project(b:composer_root)
-let s:project._commands = {'_': s:composer_commands}
-let s:project._json = {'require': {'some/package': '1.0.0'}}
+call s:project.cache.set('commands', s:composer_commands)
+call s:project.cache.set('json', {'require': {'some/package': '1.0.0'}})
 
 describe 's:filter_completions()'
   it 'returns a list of completions'
