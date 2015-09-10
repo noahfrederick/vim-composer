@@ -268,6 +268,8 @@ let s:project_prototype.cache = s:cache_prototype
 augroup composer_cache
   autocmd!
   autocmd BufWritePost composer.json call composer#cache_clear('json')
+  autocmd User ComposerCmdPost       call composer#cache_clear('json')
+  autocmd User ComposerCmdPost       call composer#cache_clear('lock')
 augroup END
 
 ""
@@ -313,6 +315,9 @@ function! s:composer_cmd(...) abort
     endif
     let &l:makeprg = s:project().makeprg()
 
+    let g:composer_cmd_args = args
+    silent doautocmd User ComposerCmdPre
+
     if exists(':Make') == 2
       execute join(['Make' . bang] + args)
     else
@@ -321,6 +326,9 @@ function! s:composer_cmd(...) abort
         return 'cwindow'
       endif
     endif
+
+    silent doautocmd User ComposerCmdPost
+
     return ''
   finally
     let &l:errorformat = old_errorformat
@@ -329,6 +337,7 @@ function! s:composer_cmd(...) abort
     if empty(old_compiler)
       unlet! b:current_compiler
     endif
+    unlet! g:composer_cmd_args
 
     call s:cd(cwd)
   endtry
