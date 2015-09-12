@@ -180,6 +180,13 @@ function! s:project_packages_required() dict abort
   return get(self.json(), 'require', {})
 endfunction
 
+""
+" Get Dict of scripts in composer.json, where the keys represent
+" event/command names and the values represent commands.
+function! s:project_scripts() dict abort
+  return get(self.json(), 'scripts', {})
+endfunction
+
 function! s:project_makeprg() dict abort
   if self.has_file('composer.phar')
     return 'php composer.phar'
@@ -223,7 +230,7 @@ function! s:project_commands(...) dict abort
   return self.cache.get(cache)
 endfunction
 
-call s:add_methods('project', ['path', 'has_file', 'json', 'query', 'makeprg', 'exec', 'commands', 'packages_required'])
+call s:add_methods('project', ['path', 'has_file', 'json', 'query', 'scripts', 'makeprg', 'exec', 'commands', 'packages_required'])
 
 let s:cache_prototype = {'cache': {}}
 
@@ -369,6 +376,10 @@ function! composer#complete(A, L, P) abort
 
   if help ==# '' && index(['remove', 'update', 'suggests'], subcommand) >= 0
     let candidates = candidates + keys(s:project().packages_required())
+  endif
+
+  if help ==# '' && index(['run-script', ''], subcommand) >= 0
+    let candidates = candidates + keys(s:project().scripts())
   endif
 
   return s:filter_completions(candidates, a:A)

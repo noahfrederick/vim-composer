@@ -2,7 +2,7 @@
 " Maintainer: Noah Frederick
 
 let s:fixtures = fnamemodify('t/fixtures/', ':p')
-let s:composer_commands = ['global', 'install', 'update', 'suggests', 'remove', 'help']
+let s:composer_commands = ['global', 'install', 'update', 'suggests', 'remove', 'help', 'run-script']
 
 call vspec#hint({'sid': 'composer#sid()'})
 
@@ -10,7 +10,13 @@ call vspec#hint({'sid': 'composer#sid()'})
 let b:composer_root = s:fixtures . 'project-composer/'
 let s:project = composer#project(b:composer_root)
 call s:project.cache.set('commands', s:composer_commands)
-call s:project.cache.set('json', {'require': {'some/package': '1.0.0'}})
+call s:project.cache.set('json', {
+      \   'require': {'some/package': '1.0.0'},
+      \   'scripts': {
+      \     'pre-install-cmd': 'foo',
+      \     'custom-command':  'bar',
+      \   },
+      \ })
 
 describe 's:filter_completions()'
   it 'returns a list of completions'
@@ -58,6 +64,10 @@ describe 'composer#complete()'
       endfor
     end
 
+    it 'returns a list containing custom commands'
+      Expect index(composer#complete('', '', 0), 'custom-command') >= 0
+    end
+
     it 'returns a list containing global flags'
       Expect index(composer#complete('', '', 0), '--xml') >= 0
     end
@@ -100,6 +110,16 @@ describe 'composer#complete()'
 
     it 'filters completions based on ArgLead'
       Expect composer#complete('in', 'help in', 7) == ['install']
+    end
+  end
+
+  context 'with run-script argument'
+    it 'returns a list containing script events'
+      Expect index(composer#complete('', 'run-script ', 11), 'pre-install-cmd') >= 0
+    end
+
+    it 'excludes events with no scripts'
+      Expect index(composer#complete('', 'run-script ', 11), 'post-root-package-install') == -1
     end
   end
 
