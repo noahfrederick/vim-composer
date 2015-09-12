@@ -221,7 +221,7 @@ function! s:project_commands(...) dict abort
       return []
     endif
 
-    call map(lines, "matchstr(v:val, '^\\w\\+')")
+    call map(lines, "matchstr(v:val, '^.\\{-}\\ze\\s')")
     call filter(lines, 'v:val != ""')
 
     call self.cache.set(cache, lines)
