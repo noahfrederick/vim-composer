@@ -362,23 +362,25 @@ function! composer#complete(A, L, P) abort
   let global = matchstr(a:L, '\<global\>')
   let help = matchstr(a:L, '\<help\>')
 
-  if global ==# 'global' && subcommand ==# ''
-    let candidates = commands + s:composer_flags['_global'] + ['help']
-  elseif help ==# 'help' && subcommand ==# ''
-    let candidates = commands + s:composer_flags['_global'] + ['global', 'help']
-  elseif has_key(s:composer_flags, subcommand) && subcommand !=# ''
-    let candidates = s:composer_flags['_global'] + s:composer_flags[subcommand]
-  elseif subcommand !=# ''
-    let candidates = s:composer_flags['_global']
-  else
-    let candidates = commands + s:composer_flags['_global'] + ['global', 'help']
+  let candidates = s:composer_flags['_global']
+
+  if empty(subcommand)
+    let candidates = candidates + commands
+
+    if empty(global)
+      let candidates = candidates + ['global', 'help']
+    else
+      let candidates = candidates + ['help']
+    endif
+  elseif has_key(s:composer_flags, subcommand)
+    let candidates = candidates + s:composer_flags[subcommand]
   endif
 
-  if help ==# '' && index(['remove', 'update', 'suggests'], subcommand) >= 0
+  if empty(help) && index(['remove', 'update', 'suggests'], subcommand) >= 0
     let candidates = candidates + keys(s:project().packages_required())
   endif
 
-  if help ==# '' && index(['run-script', ''], subcommand) >= 0
+  if empty(help) && index(['run-script', ''], subcommand) >= 0
     let candidates = candidates + keys(s:project().scripts())
   endif
 
