@@ -31,7 +31,7 @@ describe 's:filter_completions()'
     Expect index(result, '-a') < index(result, '-b')
   end
 
-  it 'sorts commands before flags'
+  it 'sorts non-flags before flags'
     let candidates = ['-a', 'b', '--foo', 'a']
     let result = vspec#call('s:filter_completions', candidates, '')
     Expect index(result, 'a')     < index(result, '-a')
@@ -48,6 +48,12 @@ describe 's:filter_completions()'
   it 'filters completions based on ArgLead'
     let candidates = ['global', 'help', 'install', 'update']
     let result = vspec#call('s:filter_completions', candidates, 'he')
+    Expect result == ['help']
+  end
+
+  it 'falls back to fuzzy matching'
+    let candidates = ['global', 'help', 'install', 'update']
+    let result = vspec#call('s:filter_completions', candidates, 'hl')
     Expect result == ['help']
   end
 end

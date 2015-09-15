@@ -389,13 +389,11 @@ endfunction
 
 ""
 " Sort and filter completion {candidates} based on the current argument {A}.
+" Adapted from bundler.vim.
 function! s:filter_completions(candidates, A) abort
   let candidates = copy(a:candidates)
   if len(candidates) == 0
     return []
-  endif
-  if len(a:A) > 0
-    call filter(candidates, "v:val =~# '^' . a:A")
   endif
   call sort(candidates)
   call s:uniq(candidates)
@@ -403,7 +401,21 @@ function! s:filter_completions(candidates, A) abort
   let commands = filter(copy(candidates), "v:val[0] !=# '-'")
   let flags = filter(copy(candidates), "v:val[0] ==# '-'")
 
-  return commands + flags
+  let candidates = commands + flags
+
+  let filtered = filter(copy(candidates), 'v:val[0:strlen(a:A)-1] ==# a:A')
+  if !empty(filtered) | return filtered | endif
+
+  let regex = substitute(a:A, '[^/:]', '[&].*', 'g')
+  let filtered = filter(copy(candidates), 'v:val =~# "^".regex')
+  if !empty(filtered) | return filtered | endif
+
+  let filtered = filter(copy(candidates), '"/".v:val =~# "[/:]".regex')
+  if !empty(filtered) | return filtered | endif
+
+  let regex = substitute(a:A, '.', '[&].*', 'g')
+  let filtered = filter(copy(candidates),'"/".v:val =~# regex')
+  return filtered
 endfunction
 
 " Unlike subcommands, composer does not list switches/flags in a friendly
