@@ -9,23 +9,25 @@ function! s:throw(msg) abort
 endfunction
 
 ""
-" Implement uniq() for older Vims. Adapted from projectionist.vim.
+" Implement the one-argument version of uniq() for older Vims.
 function! s:uniq(list) abort
   if exists('*uniq')
     return uniq(a:list)
   endif
 
   let i = 0
-  let seen = {}
+  let last = ''
+
   while i < len(a:list)
     let str = string(a:list[i])
-    if has_key(seen, str)
+    if str ==# last && i > 0
       call remove(a:list, i)
     else
-      let seen[str] = 1
+      let last = str
       let i += 1
     endif
   endwhile
+
   return a:list
 endfunction
 
