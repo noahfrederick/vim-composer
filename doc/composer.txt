@@ -41,9 +41,6 @@ Composer project, you may do so from your vimrc using an autocommand:
 ==============================================================================
 FUNCTIONS                                                 *composer-functions*
 
-composer#version()                                        *composer#version()*
-  Get the version number of the Composer.vim plug-in (e.g., '1.0.0').
-
 composer#query({key})                                       *composer#query()*
   Query {key} from composer.json for current project.
 

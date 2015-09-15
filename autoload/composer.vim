@@ -2,13 +2,6 @@
 " Maintainer: Noah Frederick
 
 ""
-" @public
-" Get the version number of the @plugin(stylized) plug-in (e.g., '1.0.0').
-function! composer#version()
-  return '0.2.0'
-endfunction
-
-""
 " Throw error with {msg}.
 function! s:throw(msg) abort
   let v:errmsg = 'composer: ' . a:msg
