@@ -225,7 +225,28 @@ function! s:project_commands(...) dict abort
   return self.cache.get(cache)
 endfunction
 
-call s:add_methods('project', ['path', 'has_file', 'json', 'query', 'scripts', 'makeprg', 'exec', 'commands', 'packages_required'])
+""
+" Search package names in available repositories.
+function! s:project_search(keyword) dict abort
+  let cache = 'search_' . a:keyword
+
+  if self.cache.needs(cache)
+    let lines = split(self.exec(['search', '--only-name', a:keyword]), "\n")
+
+    if v:shell_error != 0
+      return []
+    endif
+
+    call map(lines, "matchstr(v:val, '^.\\{-}\\ze\\s')")
+    call filter(lines, 'v:val != ""')
+
+    call self.cache.set(cache, lines)
+  endif
+
+  return self.cache.get(cache)
+endfunction
+
+call s:add_methods('project', ['path', 'has_file', 'json', 'query', 'scripts', 'makeprg', 'exec', 'commands', 'packages_required', 'search'])
 
 let s:cache_prototype = {'cache': {}}
 
@@ -371,12 +392,16 @@ function! composer#complete(A, L, P) abort
     let candidates = candidates + s:composer_flags[subcommand]
   endif
 
-  if empty(help) && index(['remove', 'update', 'suggests'], subcommand) >= 0
+  if empty(help) && index(['depends', 'remove', 'update', 'suggests'], subcommand) >= 0
     let candidates = candidates + keys(s:project().packages_required())
   endif
 
   if empty(help) && index(['run-script', ''], subcommand) >= 0
     let candidates = candidates + keys(s:project().scripts())
+  endif
+
+  if empty(help) && index(['browse', 'home', 'require', 'show'], subcommand) >= 0 && !empty(a:A)
+    let candidates = candidates + s:project().search(a:A)
   endif
 
   return s:filter_completions(candidates, a:A)
