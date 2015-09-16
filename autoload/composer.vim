@@ -69,13 +69,12 @@ endfunction
 ""
 " Get Dict from JSON {string}.
 function! s:json_parse(string) abort
-  let result = {}
   try
-    let result = projectionist#json_parse(a:string)
+    return projectionist#json_parse(a:string)
   catch /^Vim\%((\a\+)\)\=:E117/
     call s:throw('projectionist is not available')
   endtry
-  return result
+  return {}
 endfunction
 
 ""
@@ -142,6 +141,8 @@ function! s:project_has_file(file) dict abort
   return filereadable(self.path(a:file))
 endfunction
 
+call s:add_methods('project', ['path', 'has_file'])
+
 ""
 " Get JSON contents of composer.json as a Dict.
 function! s:project_json() dict abort
@@ -163,6 +164,20 @@ function! s:project_lock() dict abort
 endfunction
 
 ""
+" Get JSON contents of installed.json as a Dict.
+function! s:project_installed_json() dict abort
+  if self.cache.needs('installed_json')
+    if self.has_file('vendor/composer/installed.json')
+      call self.cache.set('installed_json', s:json_parse(readfile(self.path('vendor/composer/installed.json'))))
+    else
+      call self.cache.set('installed_json', [])
+    endif
+  endif
+
+  return self.cache.get('installed_json')
+endfunction
+
+""
 " Query {key} from project's composer.json.
 function! s:project_query(key) dict abort
   return s:get_nested(self.json(), a:key, '')
@@ -173,6 +188,12 @@ endfunction
 " package names and the values represent the version constraints.
 function! s:project_packages_required() dict abort
   return get(self.json(), 'require', {})
+endfunction
+
+""
+" Get Dict of packages installed in current project from installed.json.
+function! s:project_packages_installed() dict abort
+  return self.installed_json()
 endfunction
 
 ""
@@ -246,7 +267,7 @@ function! s:project_search(keyword) dict abort
   return self.cache.get(cache)
 endfunction
 
-call s:add_methods('project', ['path', 'has_file', 'json', 'query', 'scripts', 'makeprg', 'exec', 'commands', 'packages_required', 'search'])
+call s:add_methods('project', ['json', 'lock', 'installed_json', 'query', 'scripts', 'makeprg', 'exec', 'commands', 'packages_required', 'packages_installed', 'search'])
 
 let s:cache_prototype = {'cache': {}}
 
@@ -293,6 +314,7 @@ augroup composer_cache
   autocmd BufWritePost composer.json call composer#cache_clear('json')
   autocmd User ComposerCmdPost       call composer#cache_clear('json')
   autocmd User ComposerCmdPost       call composer#cache_clear('lock')
+  autocmd User ComposerCmdPost       call composer#cache_clear('json_installed')
 augroup END
 
 ""
