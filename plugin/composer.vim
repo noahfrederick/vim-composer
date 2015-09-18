@@ -94,7 +94,6 @@ function! s:projectionist_detect()
     call projectionist#append(b:composer_root, {
           \ "*": {
           \   "dispatch": dispatch,
-          \   "framework": "composer",
           \ },
           \ "composer.json": {
           \   "type": "composer",
