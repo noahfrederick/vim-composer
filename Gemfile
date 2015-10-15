@@ -5,6 +5,6 @@ group :development do
 end
 
 group :test do
-  gem 'vim-flavor', '~> 2.1'
+  gem 'vim-flavor', '~> 2.2'
   gem 'rake'
 end

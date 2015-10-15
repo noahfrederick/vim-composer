@@ -49,4 +49,4 @@ PLATFORMS
 DEPENDENCIES
   guard-rake
   rake
-  vim-flavor (~> 2.1)
+  vim-flavor (~> 2.2)
