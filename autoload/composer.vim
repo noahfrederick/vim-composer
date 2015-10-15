@@ -71,6 +71,8 @@ endfunction
 function! s:json_parse(string) abort
   try
     return projectionist#json_parse(a:string)
+  catch /^invalid JSON/
+    call s:throw('composer.json cannot be parsed')
   catch /^Vim\%((\a\+)\)\=:E117/
     call s:throw('projectionist is not available')
   endtry
@@ -415,11 +417,21 @@ function! composer#complete(A, L, P) abort
   endif
 
   if empty(help) && index(['depends', 'remove', 'update', 'suggests'], subcommand) >= 0
-    let candidates = candidates + keys(s:project().packages_required())
+    try
+      let candidates = candidates + keys(s:project().packages_required())
+    catch
+      " Fail silently when composer.json cannot be parsed because of missing
+      " dependency or invalid/empty file.
+    endtry
   endif
 
   if empty(help) && index(['run-script', ''], subcommand) >= 0
-    let candidates = candidates + keys(s:project().scripts())
+    try
+      let candidates = candidates + keys(s:project().scripts())
+    catch
+      " Fail silently when composer.json cannot be parsed because of missing
+      " dependency or invalid/empty file.
+    endtry
   endif
 
   if empty(help) && index(['browse', 'home', 'require', 'show'], subcommand) >= 0 && !empty(a:A)
