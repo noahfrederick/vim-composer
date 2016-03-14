@@ -205,6 +205,8 @@ function! s:project_scripts() dict abort
   return get(self.json(), 'scripts', {})
 endfunction
 
+""
+" Get Composer executable.
 function! s:project_makeprg() dict abort
   if self.has_file('composer.phar')
     return 'php composer.phar'
@@ -347,47 +349,23 @@ function! s:composer_cmd(...) abort
   let args = copy(a:000)
   let bang = remove(args, 0)
 
-  let old_makeprg = &l:makeprg
-  let old_errorformat = &l:errorformat
-  let old_compiler = get(b:, 'current_compiler', '')
+  let g:composer_cmd_args = args
+  silent doautocmd User ComposerCmdPre
 
-  try
+  if exists(':terminal')
+    tabedit %
+    execute 'lcd' fnameescape(s:project().path())
+    execute 'terminal' s:project().makeprg() join(args)
+  else
     let cwd = s:cd(s:project().path())
-
-    if !empty(findfile('compiler/composer.vim', escape(&rtp, ' ')))
-      compiler composer
-    else
-      let &l:errorformat = '%+I%.%#'
-      let b:current_compiler = 'composer'
-    endif
-    let &l:makeprg = s:project().makeprg()
-
-    let g:composer_cmd_args = args
-    silent doautocmd User ComposerCmdPre
-
-    if exists(':Make') == 2
-      execute join(['Make' . bang] + args)
-    else
-      execute join(['make!'] + args)
-      if bang ==# ''
-        return 'cwindow'
-      endif
-    endif
-
-    silent doautocmd User ComposerCmdPost
-
-    return ''
-  finally
-    let &l:errorformat = old_errorformat
-    let &l:makeprg = old_makeprg
-    let b:current_compiler = old_compiler
-    if empty(old_compiler)
-      unlet! b:current_compiler
-    endif
-    unlet! g:composer_cmd_args
-
+    execute '!' . s:project().makeprg() join(args)
     call s:cd(cwd)
-  endtry
+  endif
+
+  silent doautocmd User ComposerCmdPost
+  unlet! g:composer_cmd_args
+
+  return ''
 endfunction
 
 ""
