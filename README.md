@@ -15,19 +15,16 @@ Composer.vim provides conveniences for working with Composer PHP projects.
 Some features include:
 
 * `:Composer` command wrapper around `composer` with smart completion
-* Projectionist support (e.g., `:Ecomposer` to edit your `composer.json`, `:A`
-  to jump to `composer.lock` and back)
-* Dispatch support (`:Dispatch` runs `composer install`)
+* [Projectionist][projectionist] support (e.g., `:Ecomposer` to edit your
+  `composer.json`, `:A` to jump to `composer.lock` and back)
+* [Dispatch][dispatch] support (`:Dispatch` runs `composer install`)
 
 See `:help composer` for details.
 
 ## Installation
 
-Composer.vim depends on [Projectionist.vim][projectionist] and has an optional
-dependency on [Dispatch.vim][dispatch] for asynchronous execution of Composer
-commands.
+Composer.vim depends on [Projectionist.vim][projectionist]:
 
-	Plug 'tpope/vim-dispatch'
 	Plug 'tpope/vim-projectionist'
 	Plug 'noahfrederick/vim-composer'
 
