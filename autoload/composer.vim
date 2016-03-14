@@ -334,9 +334,8 @@ endfunction
 function! composer#buffer_setup() abort
   ""
   " @command Composer[!] [arguments]
-  " Run Composer with [arguments] via @command(:make)[!] with smart
-  " completion. The command is run asynchronously when paired with
-  " Dispatch.vim.
+  " Invoke Composer with [arguments] (with intelligent completion, including
+  " completion for package names on packagist.org).
   command! -buffer -bang -bar -nargs=? -complete=customlist,composer#complete
         \ Composer execute s:composer_cmd(<q-bang>, <f-args>)
 

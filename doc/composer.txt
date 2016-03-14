@@ -26,8 +26,8 @@ This plug-in is only available if 'compatible' is not set.
 COMMANDS                                                   *composer-commands*
 
 :Composer[!] [arguments]                                           *:Composer*
-  Run Composer with [arguments] via |:make|[!] with smart completion. The
-  command is run asynchronously when paired with Dispatch.vim.
+  Invoke Composer with [arguments] (with intelligent completion, including
+  completion for package names on packagist.org).
 
 ==============================================================================
 AUTOCOMMANDS                                           *composer-autocommands*
