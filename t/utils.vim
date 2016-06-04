@@ -18,19 +18,6 @@ describe 's:throw()'
   end
 end
 
-describe 's:uniq()'
-  it 'returns a list'
-    let result = vspec#call('s:uniq', [])
-    Expect type(result) == type([])
-  end
-
-  it 'removes adjacent duplicates'
-    let l = ['a', 'b', 'a', 'a', 'c', 'b', 'b', 'b']
-    let result = vspec#call('s:uniq', l)
-    Expect result == ['a', 'b', 'a', 'c', 'b']
-  end
-end
-
 describe 's:get_nested()'
   let g:dict = { 'foo': 'bar', 'baz': { 'x': 'a', 'y': 'b' } }
 
