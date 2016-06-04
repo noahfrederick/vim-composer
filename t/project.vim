@@ -75,7 +75,7 @@ describe 's:project()'
     end
 
     it 'throws an error'
-      Expect expr { vspec#call('s:project') } to_throw '^composer: not a composer project:'
+      Expect expr { vspec#call('s:project') } to_throw '^composer: \(.*\) does not belong to a composer project$'
     end
   end
 

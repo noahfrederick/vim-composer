@@ -2,9 +2,10 @@
 " Maintainer: Noah Frederick
 
 ""
-" Throw error with {msg}.
-function! s:throw(msg) abort
-  let v:errmsg = 'composer: ' . a:msg
+" Throw error with {msg} and replacements.
+function! s:throw(...) abort
+  let msg = a:0 > 1 ? call('printf', a:000) : a:1
+  let v:errmsg = 'composer: ' . msg
   throw v:errmsg
 endfunction
 
@@ -128,7 +129,7 @@ function! s:project(...) abort
     return project
   endif
 
-  call s:throw('not a composer project: ' . expand('%:p'))
+  call s:throw('%s does not belong to a composer project', expand('%:p'))
 endfunction
 
 ""
