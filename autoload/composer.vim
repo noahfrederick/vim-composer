@@ -49,16 +49,17 @@ endfunction
 "
 "   let val = s:get_nested(dict, 'foo.bar')
 "
-function! s:get_nested(dict, key, default) abort
+function! s:get_nested(dict, key, ...) abort
   let parts = split(a:key, '\.')
   let dict = a:dict
+  let default = get(a:000, 0, '')
 
   for part in parts
     unlet! val
-    let val = get(dict, part, '')
+    let val = get(dict, part, 'x-undefined')
 
-    if type(val) == type('') && val ==# ''
-      return a:default
+    if type(val) == type('') && val ==# 'x-undefined'
+      return default
     elseif type(val) == type({})
       let dict = val
     endif
@@ -181,9 +182,10 @@ function! s:project_installed_json() dict abort
 endfunction
 
 ""
-" Query {key} from project's composer.json.
-function! s:project_query(key) dict abort
-  return s:get_nested(self.json(), a:key, '')
+" Query {key} from project's composer.json with [default] value.
+function! s:project_query(key, ...) dict abort
+  let default = get(a:000, 0, '')
+  return s:get_nested(self.json(), a:key, default)
 endfunction
 
 ""
