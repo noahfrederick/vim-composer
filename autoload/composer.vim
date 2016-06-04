@@ -106,6 +106,18 @@ function! s:project_path(...) dict abort
 endfunction
 
 ""
+" Get vendor directory, optionally with [path] appended.
+function! s:project_vendor_dir(...) dict abort
+  let dir = self.query('config.vendor-dir', 'vendor')
+
+  if dir[0] !=# '/'
+    let dir = call('s:project_path', [dir] + a:000, self)
+  endif
+
+  return dir
+endfunction
+
+""
 " Check whether file is readable in project.
 function! s:project_has_file(file) dict abort
   return filereadable(self.path(a:file))
@@ -123,7 +135,7 @@ function! s:project_cd(...) abort
   return cwd
 endfunction
 
-call s:add_methods('project', ['path', 'has_file', 'cd'])
+call s:add_methods('project', ['path', 'vendor_dir', 'has_file', 'cd'])
 
 ""
 " Get JSON contents of composer.json as a Dict.

@@ -94,4 +94,29 @@ describe 's:project()'
   end
 end
 
+describe 's:project_vendor_dir()'
+  before
+    execute 'edit' g:fixtures . 'project-composer/index.php'
+    let b:project = composer#project()
+  end
+
+  after
+    bwipeout!
+  end
+
+  context 'without a custom vendor directory location'
+    it 'returns the default location'
+      call b:project.cache.set('json', {})
+      Expect composer#project().vendor_dir() =~# '/vendor$'
+    end
+  end
+
+  context 'with a custom vendor directory location'
+    it 'returns the location specified in composer.json'
+      call b:project.cache.set('json', {"config":{"vendor-dir":"custom_vendor"}})
+      Expect composer#project().vendor_dir() =~# '/custom_vendor$'
+    end
+  end
+end
+
 " vim: fdm=marker:sw=2:sts=2:et
