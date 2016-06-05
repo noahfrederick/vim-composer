@@ -10,7 +10,9 @@ function! composer#namespace#use(sort, class, ...) abort
   let sort = !empty(a:sort)
 
   if !empty(composer#namespace#using(empty(alias) ? a:class : alias))
-    " There is already a use statement. Abort.
+    echohl WarningMsg
+    echomsg 'Use statement for ' . a:class . ' already exists'
+    echohl None
     return
   endif
 
