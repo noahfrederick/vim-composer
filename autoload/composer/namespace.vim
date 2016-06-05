@@ -2,6 +2,39 @@
 " Maintainer: Noah Frederick
 
 ""
+" Insert use statement for {class}, optionally with [alias]. If {sort} is
+" non-empty, also sort all use statements in the buffer.
+function! composer#namespace#use(sort, class, ...) abort
+  let alias = get(a:000, 0, '')
+
+  if !empty(composer#namespace#using(a:class))
+    " There is already a use statement. Abort.
+    return
+  endif
+
+  let fqn = composer#namespace#expand(a:class)
+  let line = 'use ' . fqn
+
+  if !empty(alias)
+    let line .= ' as ' . alias
+  endif
+
+  let line .= ';'
+
+  if search('^\s*use\_s\_[[:alnum:][:blank:]\\,_]\+;', 'wbe') > 0
+    put=line
+  elseif search('^\s*namespace\_s\_[[:alnum:][:blank:]\\_]\+;', 'wbe') > 0
+    put=''
+    put=line
+  elseif search('<?\%(php\)\?', 'be') > 0
+    put=''
+    put=line
+  else
+    0put=line
+  endif
+endfunction
+
+""
 " @private
 " Find use statement matching {class}. Adapted from
 " https://github.com/arnaud-lb/vim-php-namespace/blob/master/plugin/phpns.vim

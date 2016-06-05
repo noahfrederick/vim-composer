@@ -109,4 +109,152 @@ describe 'composer#namespace#using()'
   end
 end
 
+describe 'composer#namespace#use()'
+  describe 'basic usage'
+    before
+      enew
+      setf php
+      0put = '<?php'
+      1put = ''
+      2put = 'namespace Foo;'
+      3put = ''
+      4put = 'use \Bar;'
+      5put = '// end'
+    end
+
+    after
+      bwipeout!
+    end
+
+    context 'given a fully-qualified name'
+      it 'inserts it verbatim'
+        call composer#namespace#use(0, '\Baz')
+        Expect line('$') == 8
+        Expect search('^use \\Baz;$', 'cw') > 0
+      end
+    end
+
+    context 'given an unqualified name'
+      it 'expands the name'
+        call composer#namespace#use(0, 'Baz')
+        Expect line('$') == 8
+        Expect search('^use \\Foo\\Baz;$', 'cw') > 0
+      end
+    end
+
+    context 'given an alias'
+      it 'include an as'
+        call composer#namespace#use(0, '\Baz', 'Fiz')
+        Expect line('$') == 8
+        Expect search('^use \\Baz as Fiz;$', 'cw') > 0
+      end
+    end
+
+    context 'when there is already a matching use statement'
+      it 'does nothing'
+        call composer#namespace#use(0, 'Bar')
+        Expect line('$') == 7
+        call composer#namespace#use(0, '\Bar')
+        Expect line('$') == 7
+      end
+    end
+  end
+
+  describe 'placement'
+    after
+      bwipeout!
+    end
+
+    context 'in a buffer with existing use statements'
+      before
+        enew
+        setf php
+        0put = '<?php'
+        1put = ''
+        2put = 'namespace Foo;'
+        3put = ''
+        4put = 'use \Bar;'
+        5put = 'use \Baz;'
+        6put = '// end'
+      end
+
+      it 'inserts after all use statements'
+        call composer#namespace#use(0, '\Foo')
+        Expect getline(7) ==# 'use \Foo;'
+        Expect getline(8) ==# '// end'
+      end
+    end
+
+    context 'in a buffer with only a namespace declaration'
+      before
+        enew
+        setf php
+        0put = '<?php'
+        1put = ''
+        2put = 'namespace Foo;'
+        3put = '// end'
+      end
+
+      it 'inserts after the namespace and a blank line'
+        call composer#namespace#use(0, '\Foo')
+        Expect getline(4) ==# ''
+        Expect getline(5) ==# 'use \Foo;'
+        Expect getline(6) ==# '// end'
+      end
+    end
+
+    context 'in a buffer with a namespace declaration on the first line'
+      before
+        enew
+        setf php
+        0put = '<?php namespace Foo;'
+        1put = ''
+        2put = '// end'
+      end
+
+      it 'inserts after the namespace and a blank line'
+        " Note: this works because it falls back to searching for the opening
+        " PHP tag.
+        call composer#namespace#use(0, '\Foo')
+        Expect getline(2) ==# ''
+        Expect getline(3) ==# 'use \Foo;'
+        Expect getline(4) ==# ''
+        Expect getline(5) ==# '// end'
+      end
+    end
+
+    context 'in a buffer with no use statements and no namespace'
+      before
+        enew
+        setf php
+        0put = '<?php'
+        1put = ''
+        2put = '// end'
+      end
+
+      it 'inserts after the opening tag and a blank line'
+        call composer#namespace#use(0, '\Foo')
+        Expect getline(2) ==# ''
+        Expect getline(3) ==# 'use \Foo;'
+        Expect getline(4) ==# ''
+        Expect getline(5) ==# '// end'
+      end
+    end
+
+    context 'in a buffer with no use statements, namespace, or opening tag'
+      before
+        enew
+        setf php
+        0put = '// end'
+      end
+
+      it 'inserts on the first line'
+        call composer#namespace#use(0, '\Foo')
+        Expect getline(1) ==# 'use \Foo;'
+        Expect getline(2) ==# '// end'
+      end
+    end
+  end
+end
+
 " vim: fdm=marker:sw=2:sts=2:et
