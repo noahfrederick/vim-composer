@@ -23,7 +23,7 @@ function! composer#namespace#use(sort, class, ...) abort
 
   if search('^\s*use\_s\_[[:alnum:][:blank:]\\,_]\+;', 'wbe') > 0
     put=line
-  elseif search('^\s*namespace\_s\_[[:alnum:][:blank:]\\_]\+;', 'wbe') > 0
+  elseif search('^\s*namespace\_s\_[[:alnum:]\\_]\+;', 'wbe') > 0
     put=''
     put=line
   elseif search('<?\%(php\)\?', 'be') > 0
@@ -65,7 +65,7 @@ function! composer#namespace#expand(class) abort
     return a:class
   endif
 
-  let pattern = '\%(<?\%(php\s\+\)\?\)\?\s*namespace\s\+\([A-Za-z0-9_\\]\+\);'
+  let pattern = '\%(<?\%(php\s\+\)\?\)\?\s*namespace\s\+\([[:alnum:]_\\]\+\);'
   let ns = s:capture(pattern, 1)
 
   if ns isnot 0
