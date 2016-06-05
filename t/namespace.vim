@@ -151,11 +151,17 @@ describe 'composer#namespace#use()'
     end
 
     context 'when there is already a matching use statement'
-      it 'does nothing'
+      it 'does nothing without an alias'
         call composer#namespace#use(0, 'Bar')
         Expect line('$') == 7
         call composer#namespace#use(0, '\Bar')
         Expect line('$') == 7
+      end
+
+      it 'inserts a new use statement with an alias'
+        call composer#namespace#use(0, '\Bar', 'Fiz')
+        Expect line('$') == 8
+        Expect search('^use Bar as Fiz;$', 'cw') > 0
       end
     end
   end

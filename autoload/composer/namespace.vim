@@ -9,7 +9,7 @@ function! composer#namespace#use(sort, class, ...) abort
   let alias = get(a:000, 0, '')
   let sort = !empty(a:sort)
 
-  if !empty(composer#namespace#using(a:class))
+  if !empty(composer#namespace#using(empty(alias) ? a:class : alias))
     " There is already a use statement. Abort.
     return
   endif
