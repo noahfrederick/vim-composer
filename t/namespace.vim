@@ -257,4 +257,39 @@ describe 'composer#namespace#use()'
   end
 end
 
+describe 'composer#namespace#sort_uses()'
+  before
+    enew
+    setf php
+    0put  = '<?php'
+    1put  = ''
+    2put  = 'use Foo;'
+    4put  = 'use Foo\Bar as Baz;'
+    5put  = 'use Biz\Wiz as Bar;'
+    6put  = 'use Foo\Zoo\Woo;'
+    7put  = 'use Boo, Coo;'
+    8put  = 'use Doo,'
+    9put  = '    Goo,'
+    10put = '    Hoo;'
+    11put = '// end'
+  end
+
+  after
+    bwipeout!
+  end
+
+  it 'sorts all use statements in buffer'
+    call composer#namespace#sort_uses()
+    Expect getline(1) ==# '<?php'
+    Expect getline(2) ==# ''
+    Expect getline(3) ==# 'use Biz\Wiz as Bar;'
+    Expect getline(4) ==# 'use Boo, Coo;'
+    Expect getline(5) ==# 'use Doo, Goo, Hoo;'
+    Expect getline(6) ==# 'use Foo;'
+    Expect getline(7) ==# 'use Foo\Bar as Baz;'
+    Expect getline(8) ==# 'use Foo\Zoo\Woo;'
+    Expect getline(9) ==# '// end'
+  end
+end
+
 " vim: fdm=marker:sw=2:sts=2:et

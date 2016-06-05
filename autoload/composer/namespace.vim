@@ -2,6 +2,7 @@
 " Maintainer: Noah Frederick
 
 ""
+" @private
 " Insert use statement for {class}, optionally with [alias]. If {sort} is
 " non-empty, also sort all use statements in the buffer.
 function! composer#namespace#use(sort, class, ...) abort
@@ -26,12 +27,47 @@ function! composer#namespace#use(sort, class, ...) abort
   elseif search('^\s*namespace\_s\_[[:alnum:]\\_]\+;', 'wbe') > 0
     put=''
     put=line
-  elseif search('<?\%(php\)\?', 'be') > 0
+  elseif search('<?\%(php\)\?', 'wbe') > 0
     put=''
     put=line
   else
     0put=line
   endif
+
+  if a:sort
+    call composer#namespace#sort_uses()
+  endif
+endfunction
+
+""
+" @private
+" Sort use statements in buffer alphabetically.
+function! composer#namespace#sort_uses() abort
+  let save = @a
+  let @a = ''
+
+  " Collapse multiline use statements into single lines
+  while search('^\s*use\_s\_[[:alnum:][:blank:]\\,_]\+,$') > 0
+    global/^\s*use\_s\_[[:alnum:][:blank:]\\,_]\+,$/join
+  endwhile
+
+  " Gather all use statements
+  global/^\s*use\_s\_[[:alnum:][:blank:]\\,_]\+;/delete A
+
+  if search('^\s*namespace\_s\_[[:alnum:]\\_]\+;', 'wbe') > 0
+    put a
+  elseif search('<?\%(php\)\?', 'wbe') > 0
+    put a
+  else
+    0put a
+  endif
+
+  '[,']sort
+
+  " Clean up two blank lines after pasted use block
+  ']+1,']+2delete _
+
+  let @a = save
 endfunction
 
 ""
