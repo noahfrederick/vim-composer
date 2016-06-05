@@ -13,7 +13,7 @@ function! composer#namespace#use(sort, class, ...) abort
   endif
 
   let fqn = composer#namespace#expand(a:class)
-  let line = 'use ' . fqn
+  let line = 'use ' . fqn[1:-1]
 
   if !empty(alias)
     let line .= ' as ' . alias

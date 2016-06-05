@@ -63,13 +63,13 @@ describe 'composer#namespace#using()'
     setf php
     0put = '<?php'
     1put = ''
-    2put = 'use \Foo;'
-    4put = 'use \Foo\Bar as Baz;'
-    5put = 'use \Biz\Wiz as Bar;'
-    6put = 'use \Foo\Zoo\Woo;'
-    7put = 'use \Boo, \Coo;'
-    8put = 'use \Doo,'
-    9put = '    \Goo;'
+    2put = 'use Foo;'
+    4put = 'use Foo\Bar as Baz;'
+    5put = 'use Biz\Wiz as Bar;'
+    6put = 'use Foo\Zoo\Woo;'
+    7put = 'use Boo, Coo;'
+    8put = 'use Doo,'
+    9put = '    Goo;'
     10put = '// end'
   end
 
@@ -79,21 +79,21 @@ describe 'composer#namespace#using()'
 
   context 'when there is a matching use statement with as'
     it 'matches the as'
-      Expect composer#namespace#using('Bar') ==# '\Biz\Wiz'
+      Expect composer#namespace#using('Bar') ==# 'Biz\Wiz'
     end
   end
 
   context 'when there is a matching use statement without as'
     it 'matches a use'
-      Expect composer#namespace#using('Foo') ==# '\Foo'
-      Expect composer#namespace#using('Woo') ==# '\Foo\Zoo\Woo'
+      Expect composer#namespace#using('Foo') ==# 'Foo'
+      Expect composer#namespace#using('Woo') ==# 'Foo\Zoo\Woo'
     end
   end
 
   context 'when there is a use statement with multiple arguments'
     it 'matches the right argument'
-      Expect composer#namespace#using('Boo') ==# '\Boo'
-      Expect composer#namespace#using('Coo') ==# '\Coo'
+      Expect composer#namespace#using('Boo') ==# 'Boo'
+      Expect composer#namespace#using('Coo') ==# 'Coo'
     end
   end
 
@@ -104,8 +104,8 @@ describe 'composer#namespace#using()'
   end
 
   it 'handles multi-line use statements'
-    Expect composer#namespace#using('Doo') ==# '\Doo'
-    Expect composer#namespace#using('Goo') ==# '\Goo'
+    Expect composer#namespace#using('Doo') ==# 'Doo'
+    Expect composer#namespace#using('Goo') ==# 'Goo'
   end
 end
 
@@ -118,7 +118,7 @@ describe 'composer#namespace#use()'
       1put = ''
       2put = 'namespace Foo;'
       3put = ''
-      4put = 'use \Bar;'
+      4put = 'use Bar;'
       5put = '// end'
     end
 
@@ -130,7 +130,7 @@ describe 'composer#namespace#use()'
       it 'inserts it verbatim'
         call composer#namespace#use(0, '\Baz')
         Expect line('$') == 8
-        Expect search('^use \\Baz;$', 'cw') > 0
+        Expect search('^use Baz;$', 'cw') > 0
       end
     end
 
@@ -138,7 +138,7 @@ describe 'composer#namespace#use()'
       it 'expands the name'
         call composer#namespace#use(0, 'Baz')
         Expect line('$') == 8
-        Expect search('^use \\Foo\\Baz;$', 'cw') > 0
+        Expect search('^use Foo\\Baz;$', 'cw') > 0
       end
     end
 
@@ -146,7 +146,7 @@ describe 'composer#namespace#use()'
       it 'include an as'
         call composer#namespace#use(0, '\Baz', 'Fiz')
         Expect line('$') == 8
-        Expect search('^use \\Baz as Fiz;$', 'cw') > 0
+        Expect search('^use Baz as Fiz;$', 'cw') > 0
       end
     end
 
@@ -173,14 +173,14 @@ describe 'composer#namespace#use()'
         1put = ''
         2put = 'namespace Foo;'
         3put = ''
-        4put = 'use \Bar;'
-        5put = 'use \Baz;'
+        4put = 'use Bar;'
+        5put = 'use Baz;'
         6put = '// end'
       end
 
       it 'inserts after all use statements'
         call composer#namespace#use(0, '\Foo')
-        Expect getline(7) ==# 'use \Foo;'
+        Expect getline(7) ==# 'use Foo;'
         Expect getline(8) ==# '// end'
       end
     end
@@ -198,7 +198,7 @@ describe 'composer#namespace#use()'
       it 'inserts after the namespace and a blank line'
         call composer#namespace#use(0, '\Foo')
         Expect getline(4) ==# ''
-        Expect getline(5) ==# 'use \Foo;'
+        Expect getline(5) ==# 'use Foo;'
         Expect getline(6) ==# '// end'
       end
     end
@@ -217,7 +217,7 @@ describe 'composer#namespace#use()'
         " PHP tag.
         call composer#namespace#use(0, '\Foo')
         Expect getline(2) ==# ''
-        Expect getline(3) ==# 'use \Foo;'
+        Expect getline(3) ==# 'use Foo;'
         Expect getline(4) ==# ''
         Expect getline(5) ==# '// end'
       end
@@ -235,7 +235,7 @@ describe 'composer#namespace#use()'
       it 'inserts after the opening tag and a blank line'
         call composer#namespace#use(0, '\Foo')
         Expect getline(2) ==# ''
-        Expect getline(3) ==# 'use \Foo;'
+        Expect getline(3) ==# 'use Foo;'
         Expect getline(4) ==# ''
         Expect getline(5) ==# '// end'
       end
@@ -250,7 +250,7 @@ describe 'composer#namespace#use()'
 
       it 'inserts on the first line'
         call composer#namespace#use(0, '\Foo')
-        Expect getline(1) ==# 'use \Foo;'
+        Expect getline(1) ==# 'use Foo;'
         Expect getline(2) ==# '// end'
       end
     end
