@@ -271,7 +271,11 @@ describe 'composer#namespace#sort_uses()'
     8put  = 'use Doo,'
     9put  = '    Goo,'
     10put = '    Hoo;'
-    11put = '// end'
+    11put = ''
+    12put = 'class MyClass {'
+    13put = '    use Trait;'
+    14put = '}'
+    15put = '// end'
   end
 
   after
@@ -288,7 +292,12 @@ describe 'composer#namespace#sort_uses()'
     Expect getline(6) ==# 'use Foo;'
     Expect getline(7) ==# 'use Foo\Bar as Baz;'
     Expect getline(8) ==# 'use Foo\Zoo\Woo;'
-    Expect getline(9) ==# '// end'
+    Expect getline(9) ==# ''
+    Expect getline(10) ==# ''
+    Expect getline(11) ==# 'class MyClass {'
+    Expect getline(12) ==# '    use Trait;'
+    Expect getline(13) ==# '}'
+    Expect getline(14) ==# '// end'
   end
 end
 

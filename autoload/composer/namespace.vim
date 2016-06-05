@@ -7,6 +7,7 @@
 " non-empty, also sort all use statements in the buffer.
 function! composer#namespace#use(sort, class, ...) abort
   let alias = get(a:000, 0, '')
+  let sort = !empty(a:sort)
 
   if !empty(composer#namespace#using(a:class))
     " There is already a use statement. Abort.
@@ -22,7 +23,7 @@ function! composer#namespace#use(sort, class, ...) abort
 
   let line .= ';'
 
-  if search('^\s*use\_s\_[[:alnum:][:blank:]\\,_]\+;', 'wbe') > 0
+  if search('^use\_s\_[[:alnum:][:blank:]\\,_]\+;', 'wbe') > 0
     put=line
   elseif search('^\s*namespace\_s\_[[:alnum:]\\_]\+;', 'wbe') > 0
     put=''
@@ -34,9 +35,11 @@ function! composer#namespace#use(sort, class, ...) abort
     0put=line
   endif
 
-  if a:sort
+  if sort
     call composer#namespace#sort_uses()
   endif
+
+  return ''
 endfunction
 
 ""
@@ -46,13 +49,15 @@ function! composer#namespace#sort_uses() abort
   let save = @a
   let @a = ''
 
+  normal! m`
+
   " Collapse multiline use statements into single lines
-  while search('^\s*use\_s\_[[:alnum:][:blank:]\\,_]\+,$') > 0
-    global/^\s*use\_s\_[[:alnum:][:blank:]\\,_]\+,$/join
+  while search('^use\_s\_[[:alnum:][:blank:]\\,_]\+,$') > 0
+    global/^use\_s\_[[:alnum:][:blank:]\\,_]\+,$/join
   endwhile
 
   " Gather all use statements
-  global/^\s*use\_s\_[[:alnum:][:blank:]\\,_]\+;/delete A
+  global/^use\_s\_[[:alnum:][:blank:]\\,_]\+;/delete A
 
   if search('^\s*namespace\_s\_[[:alnum:]\\_]\+;', 'wbe') > 0
     put a
@@ -64,8 +69,10 @@ function! composer#namespace#sort_uses() abort
 
   '[,']sort
 
-  " Clean up two blank lines after pasted use block
-  ']+1,']+2delete _
+  " Clean up blank line after pasted use block
+  ']+1delete _
+
+  normal! ``
 
   let @a = save
 endfunction
