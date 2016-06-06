@@ -1,6 +1,6 @@
 {
 	"name": "composer",
-	"version": "0.4.1",
+	"version": "0.5.0",
 	"author": "Noah Frederick",
 	"description": "Vim support for Composer PHP projects",
 	"homepage": "https://github.com/noahfrederick/vim-composer",
