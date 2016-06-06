@@ -332,6 +332,15 @@ function! composer#buffer_setup() abort
   command! -buffer -bang -bar -nargs=? -complete=customlist,composer#commandline#complete
         \ Composer execute composer#commandline#exec(<q-bang>, <f-args>)
 
+  if &filetype =~# 'php'
+    ""
+    " @command Use[!] {class} [alias]
+    " Insert a use statement for {class}, optionally with [alias]. Include [!]
+    " to also sort the use statements in the buffer.
+    command! -buffer -bang -bar -nargs=+
+          \ Use execute composer#namespace#use(<q-bang>, <f-args>)
+  endif
+
   silent doautocmd User Composer
 endfunction
 

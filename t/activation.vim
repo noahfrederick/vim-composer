@@ -53,6 +53,10 @@ describe 'composer#buffer_setup()'
       Expect exists(':Composer') != 2
     end
 
+    it 'does not define the :Use command'
+      Expect exists(':Use') != 2
+    end
+
     it 'does not fire user autocommand'
       Expect exists('b:did_autocommand') to_be_false
     end
@@ -60,11 +64,32 @@ describe 'composer#buffer_setup()'
 
   context 'in a composer project'
     before
+      filetype plugin on
       execute 'edit' g:fixtures . 'project-composer/index.php'
     end
 
     it 'defines the :Composer command'
       Expect exists(':Composer') == 2
+    end
+
+    it 'defines the :Use command'
+      Expect &filetype ==# 'php'
+      Expect exists(':Use') == 2
+    end
+
+    it 'fires user autocommand'
+      Expect exists('b:did_autocommand') to_be_true
+    end
+  end
+
+  context 'editing a non-PHP file in a composer project'
+    before
+      execute 'edit' g:fixtures . 'project-composer/foo'
+    end
+
+    it 'does not define the :Use command'
+      Expect &filetype !=# 'php'
+      Expect exists(':Use') == 0
     end
 
     it 'fires user autocommand'
