@@ -139,11 +139,23 @@ endfunction
 ""
 " Return the class, trait, or interface name at the cursor's location.
 function! s:class_at_cursor() abort
-  let s:match = ''
-  let pattern = '\(\<\u\|\\\)[[:alnum:]\\]\+'
-  let buf = getline('.')
-  call substitute(buf, pattern, '\=[submatch(0), s:save_match(submatch(0))][0]', '')
-  return s:match
+  " Search position of class name with cursor inside
+  let pattern = '\(\<\u\|\\\)[[:alnum:]\\_]*\%#[[:alnum:]\\_]*'
+  let [lnum, col] = searchpos(pattern, 'cnb', line('.'))
+
+  if col == 0
+    " Search position of class name with cursor right before
+    let pattern = '\%#\(\<\u\|\\\)[[:alnum:]\\_]\+'
+    let [lnum, col] = searchpos(pattern, 'cnb', line('.'))
+  endif
+
+  if col == 0
+    return ''
+  endif
+
+  " Capture the name
+  let buf = getline('.')[col - 1:]
+  return substitute(buf, '^[[:alnum:]\\_]\+\zs.*', '', '')
 endfunction
 
 ""

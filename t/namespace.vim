@@ -338,7 +338,6 @@ describe 's:class_at_cursor()'
   end
 
   it 'returns empty string when no name is at cursor'
-    TODO
     normal! 3G
     let result = vspec#call('s:class_at_cursor')
     Expect result ==# ''
