@@ -21,7 +21,7 @@ Some features include:
 * Insert `use` statement for the class/interface/trait under cursor
 * [Projectionist][projectionist] support (e.g., `:Ecomposer` to edit your
   `composer.json`, `:A` to jump to `composer.lock` and back)
-* [Dispatch][dispatch] support (`:Dispatch` runs `composer install`)
+* [Dispatch][dispatch] support (`:Dispatch` runs `composer dump-autoload`)
 
 See `:help composer` for details.
 

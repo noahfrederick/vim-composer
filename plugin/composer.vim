@@ -13,7 +13,7 @@
 " * Insert use statement for the class/interface/trait under cursor
 " * Projectionist support (e.g., :Ecomposer to edit your composer.json, :A to
 "   jump to composer.lock and back)
-" * Dispatch support (|:Dispatch| runs composer install)
+" * Dispatch support (|:Dispatch| runs composer dump-autoload)
 "
 " This plug-in is only available if 'compatible' is not set.
 
@@ -43,7 +43,7 @@
 " @section Autocommands, autocommands
 " If you want to set your own Vim settings for buffers belonging to your
 " Composer project, you may do so from your vimrc using an autocommand: >
-"   autocmd User Composer nnoremap <buffer> <F2> :Composer dump-autoload<CR>
+"   autocmd User Composer nmap <buffer> gf <Plug>(composer-find)
 " <
 
 if (exists('g:loaded_composer') && g:loaded_composer) || &cp
@@ -102,7 +102,7 @@ endif
 
 function! s:projectionist_detect()
   if s:composer_detect(get(g:, 'projectionist_file', ''))
-    let dispatch = join([composer#project().makeprg(), 'install'])
+    let dispatch = join([composer#project().makeprg(), 'dump-autoload'])
 
     call projectionist#append(b:composer_root, {
           \ "*": {
