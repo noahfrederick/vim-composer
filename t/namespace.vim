@@ -307,4 +307,78 @@ describe 'composer#namespace#sort_uses()'
   end
 end
 
+describe 's:class_at_cursor()'
+  before
+    enew
+    setf php
+    0put  = '<?php'
+    1put  = ''
+    2put  = 'use Foo;'
+    3put  = 'use Foo\Bar as Baz;'
+    4put  = ''
+    5put  = 'class MyClass extends \ThatClass {'
+    6put  = '    use SomeTrait;'
+    7put  = '    public function fooBar($car) {'
+    8put  = '        return new \Zoo\War\Far($car);'
+    9put  = '    }'
+    10put = '}'
+    11put = '// end'
+    1
+  end
+
+  after
+    bwipeout!
+  end
+
+  it 'does not move the cursor'
+    normal! 4GfB
+    call vspec#call('s:class_at_cursor')
+    Expect line('.') == 4
+    Expect col('.') == 9
+  end
+
+  it 'returns empty string when no name is at cursor'
+    TODO
+    normal! 3G
+    let result = vspec#call('s:class_at_cursor')
+    Expect result ==# ''
+  end
+
+  it 'does not match inside a non-class name'
+    normal! 8GfB
+    let result = vspec#call('s:class_at_cursor')
+    Expect result ==# ''
+  end
+
+  it 'returns a simple class name'
+    normal! 3GfF
+    let result = vspec#call('s:class_at_cursor')
+    Expect result ==# 'Foo'
+  end
+
+  it 'returns a qualified class name'
+    normal! 4GfF
+    let result = vspec#call('s:class_at_cursor')
+    Expect result ==# 'Foo\Bar'
+  end
+
+  it 'returns a qualified class name when at the middle'
+    normal! 4GfB
+    let result = vspec#call('s:class_at_cursor')
+    Expect result ==# 'Foo\Bar'
+  end
+
+  it 'returns a qualified class name when at the end'
+    normal! 4Gfr
+    let result = vspec#call('s:class_at_cursor')
+    Expect result ==# 'Foo\Bar'
+  end
+
+  it 'returns a complex qualified class name'
+    normal! 9GfZ
+    let result = vspec#call('s:class_at_cursor')
+    Expect result ==# '\Zoo\War\Far'
+  end
+end
+
 " vim: fdm=marker:sw=2:sts=2:et

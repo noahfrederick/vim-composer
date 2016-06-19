@@ -132,7 +132,17 @@ endfunction
 function! s:capture(pattern, submatch)
   let s:match = 0
   let buf = join(getline(1, '$'), "\n")
-  call substitute(buf, a:pattern, '\=[submatch(0), s:save_match(submatch(' . a:submatch . '))][0]', 'e')
+  call substitute(buf, a:pattern, '\=[submatch(0), s:save_match(submatch(' . a:submatch . '))][0]', '')
+  return s:match
+endfunction
+
+""
+" Return the class, trait, or interface name at the cursor's location.
+function! s:class_at_cursor() abort
+  let s:match = ''
+  let pattern = '\(\<\u\|\\\)[[:alnum:]\\]\+'
+  let buf = getline('.')
+  call substitute(buf, pattern, '\=[submatch(0), s:save_match(submatch(0))][0]', '')
   return s:match
 endfunction
 
