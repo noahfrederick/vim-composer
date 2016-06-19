@@ -5,9 +5,10 @@ Noah Frederick                                       *Composer.vim* *composer*
 CONTENTS                                                   *composer-contents*
   1. Introduction.............................................|composer-intro|
   2. Commands..............................................|composer-commands|
-  3. Autocommands......................................|composer-autocommands|
-  4. Functions............................................|composer-functions|
-  5. About....................................................|composer-about|
+  3. Mappings..................................................|composer-maps|
+  4. Autocommands......................................|composer-autocommands|
+  5. Functions............................................|composer-functions|
+  6. About....................................................|composer-about|
 
 ==============================================================================
 INTRODUCTION                                                  *composer-intro*
@@ -16,6 +17,8 @@ Composer.vim provides conveniences for working with Composer PHP projects.
 Some features include:
 
   * |:Composer| command wrapper around composer with smart completion
+  * Navigate to source files using Composer's autoloader
+  * Insert use statement for the class/interface/trait under cursor
   * Projectionist support (e.g., :Ecomposer to edit your composer.json, :A to
     jump to composer.lock and back)
   * Dispatch support (|:Dispatch| runs composer install)
@@ -32,6 +35,18 @@ COMMANDS                                                   *composer-commands*
 :Use[!] {class} [alias]                                                 *:Use*
   Insert a use statement for {class}, optionally with [alias]. Include [!] to
   also sort the use statements in the buffer.
+
+==============================================================================
+MAPPINGS                                                       *composer-maps*
+
+<Plug>(composer-find)
+
+Find definition of class, interface, or trait under the cursor using
+Composer's autoload mechanism.
+
+<Plug>(composer-use)
+
+Insert a use statement for the class/interface/trait under the cursor.
 
 ==============================================================================
 AUTOCOMMANDS                                           *composer-autocommands*

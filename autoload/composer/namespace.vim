@@ -84,15 +84,17 @@ endfunction
 " Find use statement matching {class}. Adapted from
 " https://github.com/arnaud-lb/vim-php-namespace/blob/master/plugin/phpns.vim
 function! composer#namespace#using(class) abort
+  let class = escape(substitute(a:class, '^\\', '', ''), '\')
+
   " Matches: use Foo\Bar as {class};
-  let pattern = '\%(^\|\r\|\n\)\s*use\_s\+\_[^;]\{-}\_s*\([^;,]*\)\_s\+as\_s\+' . a:class . '\_s*[;,]'
+  let pattern = '\%(^\|\r\|\n\)\s*use\_s\+\_[^;]\{-}\_s*\([^;,]*\)\_s\+as\_s\+' . class . '\_s*[;,]'
   let fqn = s:capture(pattern, 1)
   if fqn isnot 0
     return fqn
   endif
 
   " Matches: use Foo\{class};
-  let pattern = '\%(^\|\r\|\n\)\s*use\_s\+\_[^;]\{-}\_s*\([^;,]*' . a:class . '\)\_s*[;,]'
+  let pattern = '\%(^\|\r\|\n\)\s*use\_s\+\_[^;]\{-}\_s*\([^;,]*' . class . '\)\_s*[;,]'
   let fqn = s:capture(pattern, 1)
   if fqn isnot 0
     return fqn
@@ -138,6 +140,7 @@ endfunction
 
 ""
 " Return the class, trait, or interface name at the cursor's location.
+" If no such name is at the cursor, return empty string.
 function! s:class_at_cursor() abort
   " Search position of class name with cursor inside
   let pattern = '\(\<\u\|\\\)[[:alnum:]\\_]*\%#[[:alnum:]\\_]*'
@@ -156,6 +159,21 @@ function! s:class_at_cursor() abort
   " Capture the name
   let buf = getline('.')[col - 1:]
   return substitute(buf, '^[[:alnum:]\\_]\+\zs.*', '', '')
+endfunction
+
+""
+" @private
+" Get the class, trait, or interface name at the cursor's location.
+function! composer#namespace#class_at_cursor() abort
+  let class = s:class_at_cursor()
+
+  if empty(class)
+    echohl WarningMsg
+    echomsg 'No class/trait/interface name at cursor'
+    echohl None
+  endif
+
+  return class
 endfunction
 
 ""

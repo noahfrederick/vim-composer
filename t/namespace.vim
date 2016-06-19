@@ -81,12 +81,20 @@ describe 'composer#namespace#using()'
     it 'matches the as'
       Expect composer#namespace#using('Bar') ==# 'Biz\Wiz'
     end
+
+    it 'does not match the non-aliased name'
+      Expect composer#namespace#using('Foo\Bar') ==# ''
+    end
   end
 
   context 'when there is a matching use statement without as'
     it 'matches a use'
       Expect composer#namespace#using('Foo') ==# 'Foo'
       Expect composer#namespace#using('Woo') ==# 'Foo\Zoo\Woo'
+    end
+
+    it 'matches a qualified name'
+      Expect composer#namespace#using('Foo\Zoo\Woo') ==# 'Foo\Zoo\Woo'
     end
   end
 

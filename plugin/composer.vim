@@ -4,11 +4,13 @@
 ""
 " @section Introduction, intro
 " @stylized Composer.vim
-" @order intro commands autocommands functions about
+" @order intro commands maps autocommands functions about
 " @plugin(stylized) provides conveniences for working with Composer PHP
 " projects. Some features include:
 "
 " * @command(:Composer) command wrapper around composer with smart completion
+" * Navigate to source files using Composer's autoloader
+" * Insert use statement for the class/interface/trait under cursor
 " * Projectionist support (e.g., :Ecomposer to edit your composer.json, :A to
 "   jump to composer.lock and back)
 " * Dispatch support (|:Dispatch| runs composer install)
@@ -25,6 +27,17 @@
 "
 " Please report issues on GitHub as well:
 " https://github.com/noahfrederick/vim-@plugin(name)/issues
+
+""
+" @section Mappings, maps
+" <Plug>(composer-find)
+"
+" Find definition of class, interface, or trait under the cursor using
+" Composer's autoload mechanism.
+"
+" <Plug>(composer-use)
+"
+" Insert a use statement for the class/interface/trait under the cursor.
 
 ""
 " @section Autocommands, autocommands

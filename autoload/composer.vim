@@ -120,7 +120,8 @@ endfunction
 ""
 " Check whether file is readable in project.
 function! s:project_has_file(file) dict abort
-  return filereadable(self.path(a:file))
+  let path = a:file[0] ==# '/' ? a:file : self.path(a:file)
+  return filereadable(path)
 endfunction
 
 ""
@@ -339,6 +340,15 @@ function! composer#buffer_setup() abort
     " to also sort the use statements in the buffer.
     command! -buffer -bang -bar -nargs=+
           \ Use execute composer#namespace#use(<q-bang>, <f-args>)
+
+    ""
+    " Find definition of class, interface, or trait under the cursor using
+    " Composer's autoload mechanism.
+    nnoremap <buffer> <Plug>(composer-find) :<C-u>execute composer#autoload#find()<CR>
+
+    ""
+    " Insert a use statement for the class/interface/trait under the cursor.
+    nnoremap <buffer> <Plug>(composer-use) :<C-u>execute 'Use' composer#namespace#class_at_cursor()<CR>
   endif
 
   silent doautocmd User Composer
