@@ -36,9 +36,15 @@ endfunction
 
 ""
 " Get Dict from JSON {string}.
-function! s:json_parse(string) abort
+function! s:json_decode(string) abort
   try
-    return projectionist#json_parse(a:string)
+    if exists('*json_decode')
+      return json_decode(a:string)
+    else
+      return projectionist#json_parse(a:string)
+    endif
+  catch /^Vim\%((\a\+)\)\=:E474/
+    call s:throw('composer.json cannot be parsed')
   catch /^invalid JSON/
     call s:throw('composer.json cannot be parsed')
   catch /^Vim\%((\a\+)\)\=:E117/
@@ -142,7 +148,7 @@ call s:add_methods('project', ['path', 'vendor_dir', 'has_file', 'cd'])
 " Get JSON contents of composer.json as a Dict.
 function! s:project_json() dict abort
   if self.cache.needs('json')
-    call self.cache.set('json', s:json_parse(readfile(self.path('composer.json'))))
+    call self.cache.set('json', s:json_decode(readfile(self.path('composer.json'))))
   endif
 
   return self.cache.get('json')
@@ -152,7 +158,7 @@ endfunction
 " Get JSON contents of composer.lock as a Dict.
 function! s:project_lock() dict abort
   if self.cache.needs('lock') && self.has_file('composer.lock')
-    call self.cache.set('lock', s:json_parse(readfile(self.path('composer.lock'))))
+    call self.cache.set('lock', s:json_decode(readfile(self.path('composer.lock'))))
   endif
 
   return self.cache.get('lock')
@@ -163,7 +169,7 @@ endfunction
 function! s:project_installed_json() dict abort
   if self.cache.needs('installed_json')
     if self.has_file('vendor/composer/installed.json')
-      call self.cache.set('installed_json', s:json_parse(readfile(self.path('vendor/composer/installed.json'))))
+      call self.cache.set('installed_json', s:json_decode(readfile(self.path('vendor/composer/installed.json'))))
     else
       call self.cache.set('installed_json', [])
     endif
