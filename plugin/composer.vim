@@ -32,12 +32,20 @@
 " @section Mappings, maps
 " <Plug>(composer-find)
 "
-" Find definition of class, interface, or trait under the cursor using
-" Composer's autoload mechanism.
+" Find the definition of class, interface, or trait under the cursor using
+" Composer's autoload mechanism. It is namespace-aware and even resolves
+" aliases in 'use' statements. For example, it does what you want with the
+" cursor on 'Env' in the last line: >
+"   <?php namespace App;
+"
+"   use Dotenv\Dotenv as Env;
+"
+"   $env = new Env(__DIR__);
+" <
 "
 " <Plug>(composer-use)
 "
-" Insert a use statement for the class/interface/trait under the cursor.
+" Insert a use statement for the class, interface, or trait under the cursor.
 
 ""
 " @section Autocommands, autocommands
