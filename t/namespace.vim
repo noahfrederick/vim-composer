@@ -85,6 +85,10 @@ describe 'composer#namespace#using()'
     it 'does not match the non-aliased name'
       Expect composer#namespace#using('Foo\Bar') ==# ''
     end
+
+    it 'matches the non-aliased name with second arg'
+      Expect composer#namespace#using('Foo\Bar', 1) ==# 'Foo\Bar'
+    end
   end
 
   context 'when there is a matching use statement without as'

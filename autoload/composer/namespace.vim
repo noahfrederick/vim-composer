@@ -83,8 +83,9 @@ endfunction
 " @private
 " Find use statement matching {class}. Adapted from
 " https://github.com/arnaud-lb/vim-php-namespace/blob/master/plugin/phpns.vim
-function! composer#namespace#using(class) abort
+function! composer#namespace#using(class, ...) abort
   let class = escape(substitute(a:class, '^\\', '', ''), '\')
+  let allow_aliased = get(a:000, 0, 0)
 
   " Matches: use Foo\Bar as {class};
   let pattern = '\%(^\|\r\|\n\)\s*use\_s\+\_[^;]\{-}\_s*\([^;,]*\)\_s\+as\_s\+' . class . '\_s*[;,]'
@@ -98,6 +99,15 @@ function! composer#namespace#using(class) abort
   let fqn = s:capture(pattern, 1)
   if fqn isnot 0
     return fqn
+  endif
+
+  if allow_aliased
+    " Matches: use {class} as Bar;
+    let pattern = '\%(^\|\r\|\n\)\s*use\_s\+\_[^;]\{-}\_s*\([^;,]*' . class . '\)'
+    let fqn = s:capture(pattern, 1)
+    if fqn isnot 0
+      return fqn
+    endif
   endif
 
   return ''

@@ -21,7 +21,7 @@ function! composer#autoload#find(...) abort
   elseif class[0] ==# '\'
     let fqn = class
   else
-    let fqn = composer#namespace#using(class)
+    let fqn = composer#namespace#using(class, 1)
 
     if empty(fqn)
       let fqn = composer#namespace#expand(class)
