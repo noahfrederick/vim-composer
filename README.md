@@ -25,12 +25,21 @@ Some features include:
 
 See `:help composer` for details.
 
-## Installation
+## Installation and Requirements
 
-Composer.vim depends on [Projectionist.vim][projectionist]:
+Using vim-plug, for example:
 
-	Plug 'tpope/vim-projectionist'
 	Plug 'noahfrederick/vim-composer'
+
+Optionally install [Dispatch.vim][dispatch] and
+[Projectionist.vim][projectionist] for projections and asynchronous command
+execution:
+
+	Plug 'tpope/vim-dispatch'
+	Plug 'tpope/vim-projectionist'
+
+**Note**: either Projectionist.vim or Vim version 7.4.1304 or later is required
+for JSON support.
 
 ## Credits and License
 
