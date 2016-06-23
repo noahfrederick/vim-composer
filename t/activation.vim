@@ -53,10 +53,6 @@ describe 'composer#buffer_setup()'
       Expect exists(':Composer') != 2
     end
 
-    it 'does not define the :Use command'
-      Expect exists(':Use') != 2
-    end
-
     it 'does not fire user autocommand'
       Expect exists('b:did_autocommand') to_be_false
     end
@@ -70,11 +66,6 @@ describe 'composer#buffer_setup()'
 
     it 'defines the :Composer command'
       Expect exists(':Composer') == 2
-    end
-
-    it 'defines the :Use command'
-      Expect &filetype ==# 'php'
-      Expect exists(':Use') == 2
     end
 
     it 'fires user autocommand'

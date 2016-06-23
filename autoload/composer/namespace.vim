@@ -3,20 +3,21 @@
 
 ""
 " @private
-" Insert use statement for {class}, optionally with [alias]. If {sort} is
+" Insert use statement for [class], optionally with [alias]. If {sort} is
 " non-empty, also sort all use statements in the buffer.
-function! composer#namespace#use(sort, class, ...) abort
-  let alias = get(a:000, 0, '')
+function! composer#namespace#use(sort, ...) abort
+  let class = get(a:000, 0, composer#namespace#class_at_cursor())
+  let alias = get(a:000, 1, '')
   let sort = !empty(a:sort)
 
-  if !empty(composer#namespace#using(empty(alias) ? a:class : alias))
+  if !empty(composer#namespace#using(empty(alias) ? class : alias))
     echohl WarningMsg
-    echomsg 'Use statement for ' . a:class . ' already exists'
+    echomsg 'Use statement for ' . class . ' already exists'
     echohl None
     return
   endif
 
-  let fqn = composer#namespace#expand(a:class)
+  let fqn = composer#namespace#expand(class)
   let line = 'use ' . fqn[1:-1]
 
   if !empty(alias)

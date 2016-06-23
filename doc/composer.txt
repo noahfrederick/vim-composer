@@ -32,10 +32,6 @@ COMMANDS                                                   *composer-commands*
   Invoke Composer with [arguments] (with intelligent completion, including
   completion for package names on packagist.org).
 
-:Use[!] {class} [alias]                                                 *:Use*
-  Insert a use statement for {class}, optionally with [alias]. Include [!] to
-  also sort the use statements in the buffer.
-
 ==============================================================================
 MAPPINGS                                                       *composer-maps*
 

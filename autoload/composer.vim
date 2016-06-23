@@ -341,20 +341,13 @@ function! composer#buffer_setup() abort
 
   if &filetype =~# 'php'
     ""
-    " @command Use[!] {class} [alias]
-    " Insert a use statement for {class}, optionally with [alias]. Include [!]
-    " to also sort the use statements in the buffer.
-    command! -buffer -bang -bar -nargs=+
-          \ Use execute composer#namespace#use(<q-bang>, <f-args>)
-
-    ""
     " Find definition of class, interface, or trait under the cursor using
     " Composer's autoload mechanism.
     nnoremap <buffer> <Plug>(composer-find) :<C-u>execute composer#autoload#find()<CR>
 
     ""
     " Insert a use statement for the class/interface/trait under the cursor.
-    nnoremap <buffer> <Plug>(composer-use) :<C-u>execute 'Use' composer#namespace#class_at_cursor()<CR>
+    nnoremap <buffer> <Plug>(composer-use) :<C-u>execute composer#namespace#use(0)<CR>
   endif
 
   silent doautocmd User Composer
