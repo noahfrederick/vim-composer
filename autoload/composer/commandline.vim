@@ -26,7 +26,7 @@ endfunction
 
 ""
 " @private
-" The :Composer command.
+" The :Composer command. Execute !composer {arguments} in the project root.
 function! composer#commandline#exec(...) abort
   let args = copy(a:000)
   let bang = remove(args, 0)
@@ -53,7 +53,12 @@ endfunction
 
 ""
 " @private
-" Completion for the :Composer command.
+" Completion for the :Composer command, including completion of:
+"   - Global flags
+"   - Built-in subcommands
+"   - Subcommand-specific flags
+"   - Package names
+"   - Scripts defined in composer.json
 function! composer#commandline#complete(A, L, P) abort
   let commands = copy(composer#project().commands())
 

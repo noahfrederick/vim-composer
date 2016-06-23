@@ -82,7 +82,8 @@ endfunction
 
 ""
 " @private
-" Find use statement matching {class}. Adapted from
+" Find use statement matching {class}. If [allow_aliased] is non-zero, allow
+" matching a class name before an 'as'. Adapted from
 " https://github.com/arnaud-lb/vim-php-namespace/blob/master/plugin/phpns.vim
 function! composer#namespace#using(class, ...) abort
   let class = escape(substitute(a:class, '^\\', '', ''), '\')
@@ -175,6 +176,7 @@ endfunction
 ""
 " @private
 " Get the class, trait, or interface name at the cursor's location.
+" Print a warning if there is nothing relevant at the cursor.
 function! composer#namespace#class_at_cursor() abort
   let class = s:class_at_cursor()
 
