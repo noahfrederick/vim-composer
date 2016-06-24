@@ -78,11 +78,6 @@ describe 'composer#buffer_setup()'
       execute 'edit' g:fixtures . 'project-composer/foo'
     end
 
-    it 'does not define the :Use command'
-      Expect &filetype !=# 'php'
-      Expect exists(':Use') == 0
-    end
-
     it 'fires user autocommand'
       Expect exists('b:did_autocommand') to_be_true
     end
