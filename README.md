@@ -5,8 +5,6 @@ Vim support for [Composer PHP][composer] projects.
 [![Build Status][buildimg]](https://travis-ci.org/noahfrederick/vim-composer)
 [![Release][release]](https://github.com/noahfrederick/vim-composer/releases)
 
-*Note: this is a prerelease version, which may change or break frequently.*
-
 [composer]: https://getcomposer.org/
 [buildimg]: https://img.shields.io/travis/noahfrederick/vim-composer/master.svg
 [release]:  https://img.shields.io/github/tag/noahfrederick/vim-composer.svg?maxAge=2592000
