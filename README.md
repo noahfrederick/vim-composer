@@ -43,8 +43,7 @@ for JSON support.
 
 ## Credits and License
 
-Thanks to Tim Pope for [Bundler.vim][bundler], which Composer.vim is modeled
-after.
+Thanks to Tim Pope for [Bundler.vim][bundler] on which Composer.vim is modeled.
 
 Copyright © Noah Frederick. Distributed under the same terms as Vim itself.
 See `:help license`.
