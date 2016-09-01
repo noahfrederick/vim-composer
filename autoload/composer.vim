@@ -134,7 +134,7 @@ endfunction
 " Change working directory to project root or [dir], respecting current
 " window's local dir state. Returns old working directory to be restored later
 " by a second invocation of the function.
-function! s:project_cd(...) abort
+function! s:project_cd(...) dict abort
   let dir = get(a:000, 0, self.path())
   let cd = exists('*haslocaldir') && haslocaldir() ? 'lcd' : 'cd'
   let cwd = getcwd()
@@ -219,10 +219,10 @@ endfunction
 " Get output from Composer with {args} in project's root directory.
 function! s:project_exec(args) dict abort
   try
-    let cwd = s:cd(self.path())
+    let cwd = self.cd(self.path())
     let result = system(join([self.makeprg()] + a:args))
   finally
-    call s:cd(cwd)
+    call self.cd(cwd)
   endtry
 
   return result
