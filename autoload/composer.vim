@@ -76,20 +76,18 @@ let s:projects = {}
 " Get the project object belonging to the current project root, or that
 " of [root]. Initializes the project if not initialized.
 function! composer#project(...) abort
-  let dir = get(a:000, 0, exists('b:composer_root') && b:composer_root !=# '' ? b:composer_root : '')
+  let root = get(a:000, 0, exists('b:composer_root') && b:composer_root !=# '' ? b:composer_root : '')
 
-  if dir !=# ''
-    if has_key(s:projects, dir)
-      let project = get(s:projects, dir)
-    else
-      let project = {'_root': dir}
-      let s:projects[dir] = project
-    endif
-
-    return extend(project, s:project_prototype, 'keep')
+  if empty(root)
+    return {}
   endif
 
-  return {}
+  if !has_key(s:projects, root)
+    let s:projects[root] = deepcopy(s:project_prototype)
+    let s:projects[root]._root = root
+  endif
+
+  return get(s:projects, root, {})
 endfunction
 
 ""

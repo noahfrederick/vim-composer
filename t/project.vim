@@ -119,4 +119,36 @@ describe 's:project_vendor_dir()'
   end
 end
 
+describe 'composer#project().cache'
+  before
+    execute 'edit' g:fixtures . 'project-composer/index.php'
+    let b:project = composer#project()
+  end
+
+  after
+    bwipeout!
+  end
+
+  it 'sets and retrieves data'
+    call b:project.cache.set('foo', 'value')
+    Expect composer#project().cache.get('foo') ==# 'value'
+  end
+
+  it 'clears data'
+    call b:project.cache.set('bar', 'value')
+    Expect composer#project().cache.has('bar') == 1
+    call b:project.cache.clear('bar')
+    Expect composer#project().cache.has('bar') == 0
+  end
+
+  it 'only contains data for the current project'
+    call b:project.cache.set('project', 'a')
+    execute 'edit' g:fixtures . 'project-phar/index.php'
+    call composer#project().cache.set('project', 'b')
+    Expect composer#project().cache.get('project') ==# 'b'
+    bwipeout!
+    Expect composer#project().cache.get('project') ==# 'a'
+  end
+end
+
 " vim: fdm=marker:sw=2:sts=2:et
