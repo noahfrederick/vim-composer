@@ -35,13 +35,14 @@ function! s:get_nested(dict, key, ...) abort
 endfunction
 
 ""
-" Get Dict from JSON {string}.
-function! s:json_decode(string) abort
+" Get Dict from JSON {expr}.
+function! s:json_decode(expr) abort
   try
     if exists('*json_decode')
-      return json_decode(a:string)
+      let expr = type(a:expr) == type([]) ? join(a:expr, "\n") : a:expr
+      return json_decode(expr)
     else
-      return projectionist#json_parse(a:string)
+      return projectionist#json_parse(a:expr)
     endif
   catch /^Vim\%((\a\+)\)\=:E474/
     call s:throw('composer.json cannot be parsed')
