@@ -29,7 +29,7 @@ function! composer#autoload#find(...) abort
   endif
 
   try
-    return 'edit' . s:find_file(fqn)
+    return 'edit ' . s:find_file(fqn)
   catch /^composer:/
     echohl WarningMsg
     echomsg v:exception
