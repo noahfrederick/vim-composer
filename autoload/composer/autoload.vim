@@ -31,9 +31,6 @@ function! composer#autoload#find(...) abort
   try
     return 'edit ' . s:find_file(fqn)
   catch /^composer:/
-    echohl WarningMsg
-    echomsg v:exception
-    echohl None
   endtry
 
   return ''
