@@ -47,8 +47,9 @@ function! s:find_file(fqn) abort
     call s:throw('autoload.php not found. Run composer install.')
   endif
 
+  let fqn = substitute(a:fqn, '^\', '', '')
   let s = '$c = require("' . autoload . '"); echo $c->findFile($argv[1]);'
-  let path = system('php -r ' . shellescape(s) . ' ' . shellescape(a:fqn))
+  let path = system('php -r ' . shellescape(s) . ' ' . shellescape(fqn))
 
   if v:shell_error != 0
     call s:throw('Command exited with code %d', v:shell_error)
