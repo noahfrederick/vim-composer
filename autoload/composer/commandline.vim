@@ -26,7 +26,7 @@ endfunction
 
 ""
 " @private
-" The :Composer command. Execute !composer {arguments} in the project root.
+" The :Composer command. Execute !composer <arguments> in the project root.
 function! composer#commandline#exec(...) abort
   let args = copy(a:000)
   let bang = remove(args, 0)
