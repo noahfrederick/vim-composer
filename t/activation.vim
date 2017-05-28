@@ -37,6 +37,22 @@ describe 's:composer_detect()'
       Expect b:composer_root == g:fixtures . 'project-composer'
     end
   end
+
+  context 'in a dependency of a composer project'
+    it 'sets b:composer_root to the root project'
+      execute 'edit' g:fixtures . 'project-composer/vendor/foo/bar/index.php'
+      Expect exists('b:composer_root') to_be_true
+      Expect b:composer_root == g:fixtures . 'project-composer'
+    end
+  end
+
+  context 'in a composer project without a vendor autoload'
+    it 'sets b:composer_root'
+      execute 'edit' g:fixtures . 'project-uninstalled/index.php'
+      Expect exists('b:composer_root') to_be_true
+      Expect b:composer_root == g:fixtures . 'project-uninstalled'
+    end
+  end
 end
 
 describe 'composer#buffer_setup()'

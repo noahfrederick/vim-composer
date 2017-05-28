@@ -1,0 +1,3 @@
+<?php
+
+// Dummy PHP file

@@ -62,7 +62,8 @@ let g:loaded_composer = 1
 " Detection {{{
 
 ""
-" Determine whether the current or supplied [path] belongs to a Composer project
+" Determine whether the current or supplied [path] belongs to a Composer
+" project, and set b:composer_root to the path of the project root.
 function! s:composer_detect(...) abort
   if exists('b:composer_root')
     return 1
@@ -74,10 +75,19 @@ function! s:composer_detect(...) abort
     let fn = fnamemodify(fn, ':h')
   endif
 
-  let composer_json = findfile('composer.json', escape(fn, ', ') . ';')
+  let candidates = findfile('composer.json', escape(fn, ', ') . ';', -1)
 
-  if !empty(composer_json)
-    let b:composer_root = fnamemodify(composer_json, ':p:h')
+  for json in candidates
+    let root = fnamemodify(json, ':p:h')
+
+    if filereadable(root.'/vendor/autoload.php')
+      let b:composer_root = root
+      return 1
+    endif
+  endfor
+
+  if !empty(candidates)
+    let b:composer_root = fnamemodify(candidates[0], ':p:h')
     return 1
   endif
 endfunction
