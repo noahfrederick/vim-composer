@@ -59,7 +59,7 @@ function! s:find_file(fqn) abort
     call s:throw('Cannot find file for %s', a:fqn)
   endif
 
-  return path
+  return simplify(path)
 endfunction
 
 ""
