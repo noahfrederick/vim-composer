@@ -190,6 +190,8 @@ function! s:project_path_namespace(path, ...) dict abort
   let default = get(a:000, 0, '')
   " get all the psr4 namespaces from composer.json
   let psr4 = items(s:get_nested(self.json(), 'autoload.psr-4', {}))
+  let psr4_dev = items(s:get_nested(self.json(), 'autoload-dev.psr-4', {}))
+  let psr4 += psr4_dev
   " remove the path to project root if supplied
   let file_path = substitute(a:path, '^'.call('s:project_path', a:000, self).'/', '', 'i')
 
