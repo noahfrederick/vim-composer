@@ -55,8 +55,7 @@ Insert a use statement for the class, interface, or trait under the cursor.
 
 <Plug>(composer-namespace)
 
-Insert a namespace statement for the current class, based on the PSR-4 section
-in composer.json.
+Insert the namespace statement of current class based on the PSR-4 autoload.
 
 ==============================================================================
 AUTOCOMMANDS                                           *composer-autocommands*
@@ -74,7 +73,7 @@ composer#query({key})                                       *composer#query()*
   Query {key} from composer.json for current project.
 
 composer#path_namespace({path})                    *composer#path_namespace()*
-  Convert {path} to a namespace if in the PSR-4 autoload section.
+  PSR4 namespace for file path
 
 ==============================================================================
 ABOUT                                                         *composer-about*
