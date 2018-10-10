@@ -185,6 +185,38 @@ function! s:project_query(key, ...) dict abort
 endfunction
 
 ""
+" Convert {path} to a namespace value if its in composer.json PSR4 autoload
+function! s:project_path_namespace(path, ...) dict abort
+  let default = get(a:000, 0, '')
+  " get all the psr4 namespaces from composer.json
+  let psr4 = items(s:get_nested(self.json(), 'autoload.psr-4', {}))
+  let psr4_dev = items(s:get_nested(self.json(), 'autoload-dev.psr-4', {}))
+  let psr4 += psr4_dev
+  " remove the path to project root if supplied
+  let file_path = substitute(a:path, '^'.call('s:project_path', a:000, self).'/', '', 'i')
+
+  " if we were given a path with filename strip it
+  if fnamemodify(file_path, ':e') ==# 'php'
+    let file_path = fnamemodify(file_path, ':h')
+  endif
+
+  " loop psr4 namespaces
+  for space in psr4
+    let found = matchstrpos(file_path, space[1].'/')
+
+    " we matched this path from the start of ours so..
+    " .. replace fwd slash with back slash
+    " .. remove any trailing slash
+    " .. only operate on the part after namespace directory
+    if found[1]  == 0
+      return substitute(space[0] . substitute(strpart(file_path, found[2]), '/', '\', 'g'), '\$', '\1', '')
+    endif
+  endfor
+
+  return default
+endfunction
+
+""
 " Get Dict of packages required in composer.json, where the keys represent
 " package names and the values represent the version constraints.
 function! s:project_packages_required() dict abort
@@ -270,7 +302,7 @@ function! s:project_search(keyword) dict abort
   return self.cache.get(cache)
 endfunction
 
-call s:add_methods('project', ['json', 'lock', 'installed_json', 'query', 'scripts', 'makeprg', 'exec', 'commands', 'packages_required', 'packages_installed', 'search'])
+call s:add_methods('project', ['json', 'lock', 'installed_json', 'query', 'scripts', 'makeprg', 'exec', 'commands', 'packages_required', 'packages_installed', 'search', 'path_namespace'])
 
 let s:cache_prototype = {'cache': {}}
 
@@ -328,6 +360,14 @@ function! composer#query(key) abort
 endfunction
 
 ""
+" @public
+" PSR4 namespace for file path
+function! composer#path_namespace(path, ...) abort
+  let default = get(a:000, 0, '')
+  return s:project().path_namespace(a:path, default)
+endfunction
+
+""
 " @private
 " Set up Composer buffers.
 function! composer#buffer_setup() abort
@@ -347,6 +387,10 @@ function! composer#buffer_setup() abort
     ""
     " Insert a use statement for the class/interface/trait under the cursor.
     nnoremap <buffer> <Plug>(composer-use) :<C-u>execute composer#namespace#use(0)<CR>
+
+    ""
+    " Insert the namespace statement of current class based on the PSR-4 autoload.
+    nnoremap <buffer> <Plug>(composer-namespace) :<C-u>execute composer#namespace#insert()<CR>
   endif
 
   silent doautocmd User Composer

@@ -151,4 +151,36 @@ describe 'composer#project().cache'
   end
 end
 
+describe 's:project_path_namespace()'
+  before
+    execute 'edit' g:fixtures . 'project-composer/index.php'
+    let b:project = composer#project()
+
+    call b:project.cache.set('json', {
+\     "autoload": {
+\       "psr-4": {
+\          'Foo\Bar\': 'src',
+\          'Baz\Bar\': 'lib/php'
+\        }
+\      }
+\   })
+  end
+
+  after
+    bwipeout!
+  end
+
+  context 'with matching psr-4'
+    it 'returns the correct namespace'
+      Expect composer#path_namespace("lib/php/Sub/Class.php") ==# 'Baz\Bar\Sub'
+    end
+  end
+
+  context 'without matching psr-4'
+    it 'returns the correct namespace'
+      Expect composer#path_namespace("tests/Sub/Class.php") ==# ''
+    end
+  end
+end
+
 " vim: fdm=marker:sw=2:sts=2:et
