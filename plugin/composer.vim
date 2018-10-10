@@ -46,6 +46,10 @@
 " <Plug>(composer-use)
 "
 " Insert a use statement for the class, interface, or trait under the cursor.
+"
+" <Plug>(composer-namespace)
+"
+" Insert the namespace statement of current class based on the PSR-4 autoload.
 
 ""
 " @section Autocommands, autocommands

@@ -3,6 +3,36 @@
 
 ""
 " @private
+" Insert namespace statement for current class based off the PSR-4 autoload
+" definition in composer.json
+function! composer#namespace#insert() abort
+  let namespace = composer#path_namespace(expand('%:h'))
+
+  if empty(namespace)
+    echohl WarningMsg
+    echomsg 'No namespace could be found'
+    echohl None
+    return
+  endif
+
+  if search('^\s*namespace\_s\_[[:alnum:]\\_]\+;', 'wbe') > 0
+    echohl WarningMsg
+    echomsg 'A namespace statment already exists'
+    echohl None
+    return
+  endif
+
+  let line = 'namespace ' . namespace . ';'
+  if search('<?\%(php\)\?', 'wbe') > 0
+    put=''
+    put=line
+  else
+    0put=line
+  endif
+endfunction
+
+""
+" @private
 " Insert use statement for [class], optionally with [alias]. If {sort} is
 " non-empty, also sort all use statements in the buffer.
 function! composer#namespace#use(sort, ...) abort

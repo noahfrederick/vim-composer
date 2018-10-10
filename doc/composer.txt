@@ -53,6 +53,11 @@ in 'use' statements. For example, it does what you want with the cursor on
 
 Insert a use statement for the class, interface, or trait under the cursor.
 
+<Plug>(composer-namespace)
+
+Insert a namespace statement for the current class, based on the PSR-4 section
+in composer.json.
+
 ==============================================================================
 AUTOCOMMANDS                                           *composer-autocommands*
 
@@ -67,6 +72,9 @@ FUNCTIONS                                                 *composer-functions*
 
 composer#query({key})                                       *composer#query()*
   Query {key} from composer.json for current project.
+
+composer#path_namespace({path})                    *composer#path_namespace()*
+  Convert {path} to a namespace if in the PSR-4 autoload section.
 
 ==============================================================================
 ABOUT                                                         *composer-about*
