@@ -27,7 +27,7 @@ function! composer#semver#compare(a, comparator, b) abort
   let a = composer#semver#parse(a:a)
   let b = composer#semver#parse(a:b)
 
-  if funcref(s:comparators[a:comparator], [a, b])() is v:false
+  if function(s:comparators[a:comparator], [a, b])() is v:false
     return v:false
   endif
 
