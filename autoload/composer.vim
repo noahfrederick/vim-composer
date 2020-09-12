@@ -185,6 +185,29 @@ function! s:project_query(key, ...) dict abort
 endfunction
 
 ""
+" Determine if {package} is installed with optional [version] constraint.
+"
+"   composer#project().is_installed('my/package', '>=', '1.2.0')
+"
+function! s:project_is_installed(package, ...) dict abort
+  let comparator = get(a:000, 0, '')
+  let ver = get(a:000, 1, '')
+  let packages = self.packages_installed()
+
+  call filter(packages, {idx, package -> package.name == a:package})
+
+  if len(packages) < 1
+    return v:false
+  endif
+
+  if len(ver) < 1
+    return v:true
+  endif
+
+  return composer#semver#compare(packages[0].version_normalized, comparator, ver)
+endfunction
+
+""
 " Get Dict of packages required in composer.json, where the keys represent
 " package names and the values represent the version constraints.
 function! s:project_packages_required() dict abort
@@ -194,7 +217,7 @@ endfunction
 ""
 " Get Dict of packages installed in current project from installed.json.
 function! s:project_packages_installed() dict abort
-  return self.installed_json()
+  return deepcopy(self.installed_json())
 endfunction
 
 ""
@@ -270,7 +293,7 @@ function! s:project_search(keyword) dict abort
   return self.cache.get(cache)
 endfunction
 
-call s:add_methods('project', ['json', 'lock', 'installed_json', 'query', 'scripts', 'makeprg', 'exec', 'commands', 'packages_required', 'packages_installed', 'search'])
+call s:add_methods('project', ['json', 'lock', 'installed_json', 'query', 'is_installed', 'scripts', 'makeprg', 'exec', 'commands', 'packages_required', 'packages_installed', 'search'])
 
 let s:cache_prototype = {'cache': {}}
 
