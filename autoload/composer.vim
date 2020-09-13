@@ -194,7 +194,7 @@ function! s:project_is_installed(package, ...) dict abort
   let ver = get(a:000, 1, '')
   let packages = self.packages_installed()
 
-  call filter(packages, {idx, package -> package.name == a:package})
+  call filter(packages, 'v:val.name == a:package')
 
   if len(packages) < 1
     return v:false
