@@ -232,6 +232,8 @@ endfunction
 function! s:project_makeprg() dict abort
   if self.has_file('composer.phar')
     return 'php composer.phar'
+  elseif executable('composer.bat')
+    return 'composer.bat'
   else
     return 'composer'
   endif

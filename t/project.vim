@@ -45,7 +45,7 @@ describe 'composer#project()'
 
     context 's:project_makeprg()'
       it 'returns the composer executable name'
-        Expect b:project.makeprg() ==# 'composer'
+        Expect b:project.makeprg() =~# '^composer'
       end
     end
   end
