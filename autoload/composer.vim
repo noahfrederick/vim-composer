@@ -218,7 +218,9 @@ endfunction
 ""
 " Get Dict of packages installed in current project from installed.json.
 function! s:project_packages_installed() dict abort
-  return deepcopy(self.installed_json())
+  " Older format lists packages at the root, newer format nests under the
+  " 'packages' key.
+  return deepcopy(get(self.installed_json(), 'packages', self.installed_json()))
 endfunction
 
 ""
