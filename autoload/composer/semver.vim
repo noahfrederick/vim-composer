@@ -8,9 +8,9 @@ function! composer#semver#parse(version_string) abort
   let semver = {}
   let parts = matchlist(a:version_string, '\v^(\d+)%(.(\d+)%(.(\d+))?)?')
 
-  let semver.major = get(parts, 1, '')
-  let semver.minor = get(parts, 2, '')
-  let semver.patch = get(parts, 3, '')
+  let semver.major = str2nr(get(parts, 1, ''))
+  let semver.minor = str2nr(get(parts, 2, ''))
+  let semver.patch = str2nr(get(parts, 3, ''))
 
   return semver
 endfunction
@@ -48,16 +48,8 @@ function! s:is_equal(a, b) abort
     return v:false
   endif
 
-  if empty(a:a.minor) || empty(a:b.minor)
-    return v:true
-  endif
-
   if a:a.minor != a:b.minor
     return v:false
-  endif
-
-  if empty(a:a.patch) || empty(a:b.patch)
-    return v:true
   endif
 
   if a:a.patch != a:b.patch
